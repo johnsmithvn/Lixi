@@ -358,7 +358,7 @@ async function handleEnvelopeOpenConfirmed(payload) {
 
         modal.show(result, {
             showExtraChanceButton: game.canOfferExtraChance(),
-            showPlayAgainButton: result.type !== 'special',
+            showPlayAgainButton: true,
             onTrollReveal: () => {
                 sounds.playTroll();
                 confetti.fire(APP_CONFIG.effects.confetti.trollReveal);
@@ -560,7 +560,7 @@ function handlePlayAgain() {
     openFlow.close();
 
     const currentResult = game.getState().currentResult;
-    if (game.canOfferExtraChance() && currentResult?.type === 'money') {
+    if (game.canOfferExtraChance() && (currentResult?.type === 'money' || currentResult?.type === 'special')) {
         openQuizKindPicker();
         return;
     }

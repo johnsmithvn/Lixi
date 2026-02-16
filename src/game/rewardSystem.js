@@ -122,7 +122,7 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
                 icon: '👑',
                 title: `GIẢI ĐẶC BIỆT: ${SPECIAL_REWARD}`,
                 text: 'Bạn vừa mở trúng giải to nhất mùa Tết này! 🎆',
-                claimNote: '✨ Giải đặc biệt đã chốt. Không cần bốc lại nữa nha!',
+                claimNote: '✨ Trúng đậm rồi! Nếu muốn đổi vận, bạn vẫn có thể bốc lại qua quiz nha!',
                 streak: nextStreak,
                 blessing: 'Phúc - Lộc - Thọ hội tụ, năm nay chắc chắn khởi sắc! 🏮',
                 blessingList: SPECIAL_BLESSINGS,

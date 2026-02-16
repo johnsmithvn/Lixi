@@ -11,7 +11,7 @@
 
     // Neu muon bat lock binh thuong va khong dung MODE, de true.
     // Neu de false thi tuong duong FREE_MODE.
-    ENABLE_LOCK: true,
+    ENABLE_LOCK: false,
 
     // ===== OPTIONAL (ADVANCED) =====
     // MODE fallback khi ban khong dung cac flag ben tren.
@@ -48,14 +48,14 @@
     // Dinh dang de xuat: '2026-02-20T20:00:00+07:00'
     OPEN_GATE_AT: '2026-02-17T00:00:00+07:00',
     // Cho phep choi quiz trong luc cho mo cua.
-    OPEN_GATE_ALLOW_QUIZ: false,
+    OPEN_GATE_ALLOW_QUIZ: true,
 
     // ===== GAME BALANCE =====
     TOTAL_ENVELOPES: 20,
     TROLL_CHANCE: 0.2, // 20%
     // Giai dac biet lon nhat (uu tien truoc money)
-    SPECIAL_CHANCE: 0.05, // 5%
-    MONEY_CHANCE: 0.3, // 40%
+    SPECIAL_CHANCE: 0.2, // 5%
+    MONEY_CHANCE: 0.4, // 40%
     SPECIAL_CONFETTI_COUNT: 420,
 
     // ===== AUDIO SOURCES (OPTIONAL) =====

@@ -185,18 +185,19 @@ export function createGameEngine(eventBus = defaultEventBus) {
 
             if (state.hasMoney) {
                 shouldLock = true;
-                if (isSpecialWin) {
-                    lockReason = usingExtraTurn ? 'special_reroll_win' : 'special_win';
-                    state.extraChanceAvailable = false;
-                } else if (canContinueQuiz) {
-                    lockReason = usingExtraTurn ? 'reroll_win' : 'first_win';
+                if (canContinueQuiz) {
+                    lockReason = isSpecialWin
+                        ? (usingExtraTurn ? 'special_reroll_win' : 'special_win')
+                        : (usingExtraTurn ? 'reroll_win' : 'first_win');
                     state.extraChanceAvailable = true;
                     eventBus.emit('session:extra-chance-offered', {
                         mode: gameMode.mode,
                         result: state.currentResult
                     });
                 } else {
-                    lockReason = usingExtraTurn ? 'second_win' : 'first_win';
+                    lockReason = isSpecialWin
+                        ? (usingExtraTurn ? 'special_second_win' : 'special_win')
+                        : (usingExtraTurn ? 'second_win' : 'first_win');
                     state.extraChanceAvailable = false;
                 }
             } else if (canContinueQuiz) {

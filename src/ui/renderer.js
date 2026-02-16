@@ -310,19 +310,19 @@ export function createRenderer() {
         const quizStatus = payload?.quiz ?? null;
         const maxAttempts = quizStatus?.maxAttempts ?? APP_CONFIG.quiz.maxAttempts;
         const remainingAttempts = quizStatus?.remainingAttempts ?? maxAttempts;
-        const isMoneyReroll = latestResult?.type === 'money';
+        const isWinningReroll = latestResult?.type === 'money' || latestResult?.type === 'special';
 
         showScreen('game-screen');
         hideSpeech(true);
 
-        refs.gameTitle.textContent = isMoneyReroll
+        refs.gameTitle.textContent = isWinningReroll
             ? '🧧 Bạn đã trúng rồi, muốn bốc lại không?'
             : '🧧 Vận may đang khởi động lại….';
-        refs.gameSubtitle.textContent = isMoneyReroll
+        refs.gameSubtitle.textContent = isWinningReroll
             ? 'Vượt quiz để mở thêm 1 bao và ghi đè kết quả cũ.'
             : 'Nhưng bạn có thể thử thêm 1 cơ hội nữa!';
 
-        refs.openedCounter.textContent = isMoneyReroll
+        refs.openedCounter.textContent = isWinningReroll
             ? '🎯 Bonus: Qua quiz để bốc lại kết quả'
             : '🎯 Bonus: Vượt quiz là được mở thêm 1 bao';
         refs.streakCounter.textContent = `Mini Quiz: còn ${remainingAttempts}/${maxAttempts} lượt trả lời`;
@@ -336,13 +336,13 @@ export function createRenderer() {
 
         const title = document.createElement('h3');
         title.className = 'locked-title';
-        title.textContent = isMoneyReroll
+        title.textContent = isWinningReroll
             ? '🎯 Quiz xác nhận bốc lại'
             : '🎯 Thử vận may lần nữa';
 
         const message = document.createElement('p');
         message.className = 'locked-text';
-        message.textContent = isMoneyReroll
+        message.textContent = isWinningReroll
             ? `Bạn có tối đa ${maxAttempts} lần trả lời. Đúng 1 câu là được bốc lại và ghi đè kết quả cũ.`
             : `Bạn có tối đa ${maxAttempts} lần trả lời. Trúng 1 câu là được mở thêm 1 bao.`;
 
