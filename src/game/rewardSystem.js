@@ -29,13 +29,12 @@ const HOVER_QUOTES = [
     'Bốc tui xong nhớ giữ phong độ may mắn nha ✨'
 ];
 
-const MONEY_REWARDS = ['99.999đ', '8386000đ'];
-const SPECIAL_REWARD = '100000đ';
+const MONEY_REWARDS = ['99.999đ'];
+const SPECIAL_REWARD = '200.000đ';
 const SPECIAL_BLESSINGS = [
-    'Chúc bạn năm mới bình an, vững lòng trước mọi thử thách. 🌟',
-    'Chúc công việc hanh thông, làm gì cũng gặp quý nhân trợ giúp. 🤝',
-    'Chúc gia đình luôn ấm êm, sức khỏe dồi dào, tiếng cười đầy nhà. ❤️',
-    'Chúc tài lộc bền vững, niềm vui đến đều mỗi ngày. 🍀'
+    'Chúc cho 1 năm mới vạn sự như ý  🌟',
+    'Triệu sự như mơ  🤝',
+    'Trăm sự bất ngờ và hàng giờ hạnh phúc . ❤️',
 ];
 
 const JOKE_REWARDS = [

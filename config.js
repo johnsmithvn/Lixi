@@ -51,11 +51,11 @@
     OPEN_GATE_ALLOW_QUIZ: false,
 
     // ===== GAME BALANCE =====
-    TOTAL_ENVELOPES: 10,
+    TOTAL_ENVELOPES: 20,
     TROLL_CHANCE: 0.2, // 20%
     // Giai dac biet lon nhat (uu tien truoc money)
     SPECIAL_CHANCE: 0.05, // 5%
-    MONEY_CHANCE: 0.4, // 40%
+    MONEY_CHANCE: 0.3, // 40%
     SPECIAL_CONFETTI_COUNT: 420,
 
     // ===== AUDIO SOURCES (OPTIONAL) =====
