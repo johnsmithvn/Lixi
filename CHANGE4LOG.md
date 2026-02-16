@@ -41,9 +41,50 @@ Tai lieu nay dung de theo doi version va lich su thay doi cua project.
 
 ## 4. Current Version
 
-**Current:** `0.4.0`
+**Current:** `0.4.2`
 
 ## 5. Lich Su Thay Doi
+
+## [0.4.2] - 2026-02-16
+
+### Added
+- Them phan hien thi `Kết quả gần nhất` theo the ro rang hon tren man hinh lock:
+  - Badge theo loai ket qua (`money`, `joke`, `troll`)
+  - Highlight gia tri tien neu co
+  - Luon hien thi loi chuc vui nhon
+- Them cac style moi cho khu vuc ket qua lock (`latest-result-*`).
+
+### Changed
+- Loai bo hoan toan `Mã may mắn` khoi:
+  - Result modal
+  - Share text
+  - Du lieu fate luu localStorage
+- Dieu chinh text ket qua tien de tone vui nhon hon.
+
+### Fixed
+- Tranh hien thi thong tin du thua trong modal va lock screen.
+
+## [0.4.1] - 2026-02-16
+
+### Added
+- Them bo cờ boolean de bat/tat mode de dang trong `config.js`:
+  - `FREE_MODE`
+  - `EVENT_MODE`
+  - `TEST_MODE`
+  - `ENABLE_LOCK`
+- Them duration theo don vi de doc:
+  - `LOCK_DURATION_DAYS`
+  - `EVENT_LOCK_DURATION_HOURS`
+  - `TEST_LOCK_DURATION_SECONDS`
+
+### Changed
+- `src/core/config.js` ho tro dong thoi:
+  - Kieu cu (`MODE`, `*_MS`)
+  - Kieu moi (boolean flags + don vi day/hour/second)
+- Cap nhat `README.md` them huong dan toggle true/false va thu tu uu tien resolve mode.
+
+### Fixed
+- Don gian hoa thao tac config de tranh sua nham cho team non-technical.
 
 ## [0.4.0] - 2026-02-16
 
@@ -61,4 +102,3 @@ Tai lieu nay dung de theo doi version va lich su thay doi cua project.
 ### Fixed
 - Chuan hoa lock check o `startSession`, `startRound`, `openEnvelope`.
 - Tu dong xoa fate het han hoac sai mode de tranh lock sai.
-

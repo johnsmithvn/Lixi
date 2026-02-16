@@ -1,5 +1,6 @@
 ﻿const ONE_MINUTE_MS = 60 * 1000;
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
+const ONE_DAY_MS = 24 * ONE_HOUR_MS;
 const ONE_YEAR_MS = 365 * ONE_DAY_MS;
 
 export const GAME_MODES = Object.freeze({
@@ -12,6 +13,10 @@ export const GAME_MODES = Object.freeze({
 function asPositiveNumber(value, fallback) {
     const parsed = Number(value);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function asBooleanTrue(value) {
+    return value === true;
 }
 
 function normalizeMode(rawMode) {
@@ -39,6 +44,30 @@ function resolveGlobalConfig() {
     return window.APP_CONFIG ?? {};
 }
 
+function resolveModeFromFlags(config) {
+    const freeMode = asBooleanTrue(config.FREE_MODE)
+        || asBooleanTrue(config.IS_FREE_MODE)
+        || config.ENABLE_LOCK === false;
+
+    if (freeMode) {
+        return GAME_MODES.FREE;
+    }
+
+    if (asBooleanTrue(config.EVENT_MODE) || asBooleanTrue(config.IS_EVENT_MODE)) {
+        return GAME_MODES.EVENT;
+    }
+
+    if (asBooleanTrue(config.TEST_MODE) || asBooleanTrue(config.IS_TEST_MODE)) {
+        return GAME_MODES.TEST;
+    }
+
+    if (config.ENABLE_LOCK === true) {
+        return GAME_MODES.LOCKED;
+    }
+
+    return null;
+}
+
 function resolveModeFromQuery(allowOverride) {
     if (!allowOverride || typeof window === 'undefined') {
         return null;
@@ -48,10 +77,34 @@ function resolveModeFromQuery(allowOverride) {
     return normalizeMode(queryMode);
 }
 
+function resolveDurationMs(config, primaryMsKey, altKey, altUnitMs, fallback) {
+    const directMs = asPositiveNumber(config[primaryMsKey], 0);
+    if (directMs > 0) {
+        return directMs;
+    }
+
+    const altValue = asPositiveNumber(config[altKey], 0);
+    if (altValue > 0) {
+        return altValue * altUnitMs;
+    }
+
+    return fallback;
+}
+
 const globalConfig = resolveGlobalConfig();
 const allowQueryOverride = globalConfig.ALLOW_QUERY_OVERRIDE !== false;
-const configuredMode = normalizeMode(globalConfig.MODE ?? globalConfig.mode) ?? GAME_MODES.LOCKED;
-const runtimeMode = resolveModeFromQuery(allowQueryOverride) ?? configuredMode;
+
+// Priority:
+// 1) ?mode=... (when ALLOW_QUERY_OVERRIDE = true)
+// 2) Boolean flags (FREE_MODE / EVENT_MODE / TEST_MODE / ENABLE_LOCK)
+// 3) MODE string
+// 4) Default LOCKED
+const configuredModeFromFlags = resolveModeFromFlags(globalConfig);
+const configuredModeFromText = normalizeMode(globalConfig.MODE ?? globalConfig.mode);
+const runtimeMode = resolveModeFromQuery(allowQueryOverride)
+    ?? configuredModeFromFlags
+    ?? configuredModeFromText
+    ?? GAME_MODES.LOCKED;
 
 export const APP_CONFIG = {
     totalEnvelopes: 6,
@@ -81,9 +134,9 @@ export const APP_CONFIG = {
     gameMode: {
         mode: runtimeMode,
         storageKey: globalConfig.FATE_STORAGE_KEY ?? 'lixi_fate_2026',
-        lockDurationMs: asPositiveNumber(globalConfig.LOCK_DURATION_MS, ONE_YEAR_MS),
-        eventDurationMs: asPositiveNumber(globalConfig.EVENT_LOCK_DURATION_MS, ONE_DAY_MS),
-        testDurationMs: asPositiveNumber(globalConfig.TEST_LOCK_DURATION_MS, ONE_MINUTE_MS),
+        lockDurationMs: resolveDurationMs(globalConfig, 'LOCK_DURATION_MS', 'LOCK_DURATION_DAYS', ONE_DAY_MS, ONE_YEAR_MS),
+        eventDurationMs: resolveDurationMs(globalConfig, 'EVENT_LOCK_DURATION_MS', 'EVENT_LOCK_DURATION_HOURS', ONE_HOUR_MS, ONE_DAY_MS),
+        testDurationMs: resolveDurationMs(globalConfig, 'TEST_LOCK_DURATION_MS', 'TEST_LOCK_DURATION_SECONDS', ONE_MINUTE_MS, ONE_MINUTE_MS),
         allowQueryOverride
     }
 };

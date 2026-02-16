@@ -286,8 +286,84 @@ h1 {
     line-height: 1.5;
 }
 
+.latest-result {
+    margin-top: 12px;
+    border-radius: 16px;
+    padding: 12px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 243, 217, 0.82));
+    border: 1px dashed rgba(226, 135, 60, 0.4);
+}
+
+.latest-result-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.16rem;
+    color: #a83129;
+    margin-bottom: 8px;
+}
+
+.latest-result-badge {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-weight: 800;
+    font-size: 0.82rem;
+}
+
+.latest-result-badge--money {
+    background: rgba(255, 214, 90, 0.3);
+    color: #915704;
+}
+
+.latest-result-badge--joke {
+    background: rgba(255, 143, 122, 0.26);
+    color: #a23d2f;
+}
+
+.latest-result-badge--troll {
+    background: rgba(173, 164, 255, 0.22);
+    color: #5947a9;
+}
+
+.latest-result-main {
+    margin-top: 8px;
+    font-weight: 800;
+    font-size: 1.02rem;
+    color: #7f2720;
+}
+
+.latest-result-amount {
+    margin-top: 8px;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 187, 45, 0.2);
+    color: #884f08;
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.latest-result-detail {
+    margin-top: 8px;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 137, 94, 0.12);
+    color: #983d2b;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.latest-result-blessing {
+    margin-top: 8px;
+    border-radius: 10px;
+    padding: 9px 11px;
+    background: rgba(255, 101, 101, 0.1);
+    color: #99352f;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
 .locked-meta,
-.locked-code,
 .locked-remaining {
     margin-top: 10px;
     padding: 9px 10px;
@@ -300,11 +376,6 @@ h1 {
 .locked-meta {
     background: rgba(255, 137, 94, 0.12);
     color: #9d3e29;
-}
-
-.locked-code {
-    background: rgba(255, 196, 74, 0.16);
-    color: #92560d;
 }
 
 .locked-remaining {
@@ -537,8 +608,7 @@ h1 {
     opacity: 0.58;
 }
 
-.result-streak,
-.result-lucky-code {
+.result-streak {
     margin-top: 12px;
     border-radius: 14px;
     padding: 9px 12px;
@@ -549,11 +619,6 @@ h1 {
 .result-streak {
     background: rgba(255, 93, 64, 0.1);
     color: #a43325;
-}
-
-.result-lucky-code {
-    background: rgba(255, 187, 45, 0.14);
-    color: #92580c;
 }
 
 .troll-reveal {

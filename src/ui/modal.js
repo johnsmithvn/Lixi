@@ -12,7 +12,6 @@ export function createModalController() {
         refs.resultMain = document.getElementById('result-main');
         refs.resultSub = document.getElementById('result-sub');
         refs.resultStreak = document.getElementById('result-streak');
-        refs.resultLuckyCode = document.getElementById('result-lucky-code');
         refs.trollReveal = document.getElementById('troll-reveal');
 
         refs.playAgainBtn = document.getElementById('play-again-btn');
@@ -64,7 +63,6 @@ export function createModalController() {
             ? `🔥 Chuỗi may mắn: x${result.streak}`
             : 'Chuỗi may mắn hiện tại: x0';
 
-        refs.resultLuckyCode.textContent = `Mã may mắn của bạn: ${result.luckyCode}`;
         refs.trollReveal.classList.add('hidden');
         refs.trollReveal.textContent = '';
 

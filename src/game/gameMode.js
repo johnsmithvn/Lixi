@@ -71,7 +71,7 @@ export function createGameModeManager() {
                 type: result.type,
                 title: result.title,
                 text: result.text,
-                luckyCode: result.luckyCode
+                blessing: result.blessing
             }
         };
 

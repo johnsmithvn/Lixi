@@ -35,7 +35,7 @@ Web mini-game li xi theo phong cach mobile-first, tap trung vao game-feel (anima
   - `TEST`: khoa ngan de test (mac dinh 60s).
 - Locked screen:
   - Hien thong diep de thuong.
-  - Hien ket qua gan nhat, ma may man, thoi diem mo lai.
+  - Hien ket qua gan nhat ro rang + vui nhon + co loi chuc + thoi diem mo lai.
 
 ## 3. Cau Truc Thu Muc
 
@@ -105,7 +105,7 @@ Web mini-game li xi theo phong cach mobile-first, tap trung vao game-feel (anima
 
 ### 4.6 `src/utils`
 
-- `random.js`: random helpers (shuffle, pick, lucky code).
+- `random.js`: random helpers (shuffle, pick).
 - `storage.js`: wrapper localStorage (number/json).
 
 ## 5. Cau Hinh Runtime
@@ -114,22 +114,30 @@ File: `config.js` (root).
 
 ```js
 window.APP_CONFIG = {
+  FREE_MODE: false,
+  EVENT_MODE: false,
+  TEST_MODE: false,
+  ENABLE_LOCK: true,
   MODE: 'LOCKED',
-  LOCK_DURATION_MS: 365 * 24 * 60 * 60 * 1000,
-  EVENT_LOCK_DURATION_MS: 24 * 60 * 60 * 1000,
-  TEST_LOCK_DURATION_MS: 60 * 1000,
   ALLOW_QUERY_OVERRIDE: true,
+  LOCK_DURATION_DAYS: 365,
+  EVENT_LOCK_DURATION_HOURS: 24,
+  TEST_LOCK_DURATION_SECONDS: 60,
   FATE_STORAGE_KEY: 'lixi_fate_2026'
 };
 ```
 
 ### 5.1 Meaning
 
-- `MODE`: `FREE | LOCKED | EVENT | TEST`
-- `LOCK_DURATION_MS`: thoi gian lock cho `LOCKED`.
-- `EVENT_LOCK_DURATION_MS`: thoi gian lock cho `EVENT`.
-- `TEST_LOCK_DURATION_MS`: thoi gian lock cho `TEST`.
+- `FREE_MODE`: `true` = mo free mode ngay.
+- `EVENT_MODE`: `true` = lock theo chu ky event.
+- `TEST_MODE`: `true` = lock ngan de test.
+- `ENABLE_LOCK`: `false` = free mode.
+- `MODE`: fallback mode khi khong dung cờ boolean.
 - `ALLOW_QUERY_OVERRIDE`: cho phep test nhanh bang query.
+- `LOCK_DURATION_DAYS`: thoi gian lock cho `LOCKED`.
+- `EVENT_LOCK_DURATION_HOURS`: thoi gian lock cho `EVENT`.
+- `TEST_LOCK_DURATION_SECONDS`: thoi gian lock cho `TEST`.
 - `FATE_STORAGE_KEY`: key localStorage luu fate.
 
 ### 5.2 Query override
@@ -140,6 +148,21 @@ Neu `ALLOW_QUERY_OVERRIDE = true`, co the test nhanh:
 - `?mode=locked`
 - `?mode=event`
 - `?mode=test`
+
+### 5.3 Thu Tu Uu Tien (Quan Trong)
+
+He thong resolve mode theo thu tu:
+
+1. Query param `?mode=...` (neu `ALLOW_QUERY_OVERRIDE = true`).
+2. Cac co boolean (`FREE_MODE`, `EVENT_MODE`, `TEST_MODE`, `ENABLE_LOCK`).
+3. `MODE` string.
+4. Mac dinh `LOCKED`.
+
+Vi du de de chinh:
+
+- Choi free: `FREE_MODE: true`
+- Event 24h: `EVENT_MODE: true` va `FREE_MODE: false`
+- Test 60s: `TEST_MODE: true` va hai flag con lai `false`
 
 ## 6. LocalStorage Keys
 
@@ -156,8 +179,8 @@ Gia tri fate mau:
   "result": {
     "type": "money",
     "title": "Ban nhan duoc: 100.000d",
-    "text": "Chuc mung nam moi!",
-    "luckyCode": "#AB12CD"
+    "text": "Dau nam boc trung loc!",
+    "blessing": "Chuc ban nam moi tai loc day nha!"
   }
 }
 ```
@@ -196,4 +219,3 @@ Sau do mo `http://localhost:8080`.
 - Them animation flow 2-step/3-step drama cho mobile.
 - Gan file mp3 that cho `click-sfx`, `win-sfx`, `troll-sfx`.
 - Them test nhe cho logic mode va storage wrappers.
-

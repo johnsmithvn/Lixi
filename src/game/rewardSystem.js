@@ -1,5 +1,5 @@
 ﻿import { APP_CONFIG } from '../core/config.js';
-import { createLuckyCode, randomItem, shuffle } from '../utils/random.js';
+import { randomItem, shuffle } from '../utils/random.js';
 
 const ENVELOPE_FACES = [
     { emoji: '😎', label: 'Bao Ngầu' },
@@ -77,8 +77,6 @@ export function createEnvelopeSet() {
 }
 
 export function resolveEnvelopeResult(envelope, currentStreak) {
-    const luckyCode = createLuckyCode();
-
     if (envelope.isTroll) {
         return {
             nextStreak: 0,
@@ -89,7 +87,7 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
                 text: TROLL_JACKPOT.fake,
                 reveal: TROLL_JACKPOT.reveal,
                 streak: 0,
-                luckyCode,
+                blessing: 'Chúc bạn năm mới vững tâm, lộc to sẽ tới đúng lúc! 🍀',
                 confettiCount: APP_CONFIG.effects.confetti.troll
             }
         };
@@ -104,9 +102,9 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
                 type: 'money',
                 icon: '🧧',
                 title: `Bạn nhận được: ${randomItem(MONEY_REWARDS)}`,
-                text: 'Chúc mừng năm mới! Tài lộc đầy nhà 🎊',
+                text: 'Đầu năm bốc trúng lộc, quá đã luôn! 💸',
                 streak: nextStreak,
-                luckyCode,
+                blessing: 'Chúc bạn năm mới tài lộc đầy nhà, tiền vô như nước! 🎊',
                 confettiCount: nextStreak >= 3
                     ? APP_CONFIG.effects.confetti.moneyStreakBonus
                     : APP_CONFIG.effects.confetti.money
@@ -122,7 +120,7 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
             title: 'Lì xì tinh thần!',
             text: randomItem(JOKE_REWARDS),
             streak: 0,
-            luckyCode,
+            blessing: 'Chúc bạn năm mới cười thật nhiều, gặp toàn điều dễ thương! 🌸',
             confettiCount: APP_CONFIG.effects.confetti.joke
         }
     };

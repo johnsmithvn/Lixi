@@ -64,6 +64,39 @@ function getLockedHint(mode) {
     return 'Mỗi người chỉ có 1 vận may trong năm thôi nha 😆';
 }
 
+function getDefaultBlessing(resultType) {
+    if (resultType === 'money') {
+        return 'Chúc bạn năm mới tài lộc đầy nhà, tiền vô như nước! 🎊';
+    }
+
+    if (resultType === 'troll') {
+        return 'Chúc bạn năm mới vững tâm, lộc to sẽ tới đúng lúc! 🍀';
+    }
+
+    return 'Chúc bạn năm mới cười thật nhiều, gặp toàn điều dễ thương! 🌸';
+}
+
+function getResultBadge(resultType) {
+    if (resultType === 'money') {
+        return { text: '💰 Trúng lộc to', tone: 'money' };
+    }
+
+    if (resultType === 'troll') {
+        return { text: '🤡 Troll nhẹ', tone: 'troll' };
+    }
+
+    return { text: '😂 Quà tinh thần', tone: 'joke' };
+}
+
+function extractMoneyAmount(title) {
+    if (typeof title !== 'string') {
+        return null;
+    }
+
+    const match = title.match(/([0-9][0-9.,]*đ)/i);
+    return match ? match[1] : null;
+}
+
 export function createRenderer() {
     const refs = {};
     const defaults = {
@@ -192,18 +225,47 @@ export function createRenderer() {
         card.appendChild(title);
         card.appendChild(message);
 
-        if (fate?.result?.title) {
-            const summary = document.createElement('p');
-            summary.className = 'locked-meta';
-            summary.textContent = `Kết quả gần nhất: ${fate.result.title}`;
-            card.appendChild(summary);
-        }
+        if (fate?.result?.title || fate?.result?.text) {
+            const latestBlock = document.createElement('section');
+            latestBlock.className = 'latest-result';
 
-        if (fate?.result?.luckyCode) {
-            const code = document.createElement('p');
-            code.className = 'locked-code';
-            code.textContent = `Mã may mắn của bạn: ${fate.result.luckyCode}`;
-            card.appendChild(code);
+            const latestTitle = document.createElement('h4');
+            latestTitle.className = 'latest-result-title';
+            latestTitle.textContent = '🎉 Kết quả gần nhất của bạn';
+            latestBlock.appendChild(latestTitle);
+
+            const badge = getResultBadge(fate?.result?.type);
+            const badgeEl = document.createElement('p');
+            badgeEl.className = `latest-result-badge latest-result-badge--${badge.tone}`;
+            badgeEl.textContent = badge.text;
+            latestBlock.appendChild(badgeEl);
+
+            const resultMain = document.createElement('p');
+            resultMain.className = 'latest-result-main';
+            resultMain.textContent = fate?.result?.title ?? 'Bạn đã mở 1 bao lì xì.';
+            latestBlock.appendChild(resultMain);
+
+            const moneyAmount = extractMoneyAmount(fate?.result?.title);
+            if (moneyAmount) {
+                const amountEl = document.createElement('p');
+                amountEl.className = 'latest-result-amount';
+                amountEl.textContent = `Giá trị nổi bật: ${moneyAmount}`;
+                latestBlock.appendChild(amountEl);
+            }
+
+            if (fate?.result?.text) {
+                const detail = document.createElement('p');
+                detail.className = 'latest-result-detail';
+                detail.textContent = fate.result.text;
+                latestBlock.appendChild(detail);
+            }
+
+            const blessing = document.createElement('p');
+            blessing.className = 'latest-result-blessing';
+            blessing.textContent = fate?.result?.blessing ?? getDefaultBlessing(fate?.result?.type);
+            latestBlock.appendChild(blessing);
+
+            card.appendChild(latestBlock);
         }
 
         const retryAt = formatDateTime(fate?.expireAt);

@@ -25,7 +25,7 @@ function buildShareText(result) {
         result.title,
         result.text,
         streakLine,
-        `Mã may mắn: ${result.luckyCode}`,
+        result.blessing ?? 'Chúc bạn năm mới nhiều may mắn và bình an! ✨',
         '',
         `Thử vận may tại đây: ${window.location.href}`
     ].join('\n');
