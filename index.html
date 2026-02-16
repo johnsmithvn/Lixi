@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧧 Bao Lì Xì Biết Nói</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ===== PETAL CONTAINER ===== -->
+    <div id="petals-container"></div>
+
+    <!-- ===== WELCOME SCREEN ===== -->
+    <div id="welcome-screen" class="screen active">
+        <div class="welcome-content">
+            <div class="lantern lantern-left">🏮</div>
+            <div class="lantern lantern-right">🏮</div>
+            <div class="welcome-emoji">🧧</div>
+            <h1>Chào mừng tới<br><span class="highlight">Máy Lì Xì Cute</span></h1>
+            <p class="subtitle">Bao lì xì biết nói — bốc thử xem bao nào chọn bạn! 🌸</p>
+            <button id="start-btn" class="btn-start" onclick="startGame()">
+                <span>🎉 Bắt đầu bốc 🎉</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== GAME SCREEN ===== -->
+    <div id="game-screen" class="screen">
+        <h2 class="game-title">Chọn một bao lì xì nào! 🧧</h2>
+        <p class="game-subtitle">Hover để nghe bao nói, click để mở!</p>
+        <div id="envelope-grid" class="envelope-grid">
+            <!-- Envelopes injected by JS -->
+        </div>
+        <div id="envelope-speech" class="speech-bubble hidden">
+            <span id="speech-text"></span>
+        </div>
+    </div>
+
+    <!-- ===== RESULT MODAL ===== -->
+    <div id="result-modal" class="modal hidden">
+        <div class="modal-backdrop" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <div id="result-icon" class="result-icon"></div>
+            <div id="result-main" class="result-main"></div>
+            <div id="result-sub" class="result-sub"></div>
+            <!-- Troll jackpot fake -->
+            <div id="troll-reveal" class="troll-reveal hidden"></div>
+            <button class="btn-again" onclick="playAgain()">🔄 Bốc lại nào!</button>
+            <button class="btn-share" onclick="shareResult()">📤 Gửi cho bạn bè troll</button>
+        </div>
+    </div>
+
+    <!-- ===== CONFETTI CANVAS ===== -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <script src="confetti.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
