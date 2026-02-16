@@ -1,9 +1,11 @@
 ﻿import { APP_CONFIG } from './src/core/config.js';
 import { eventBus } from './src/core/eventBus.js';
 import { createGameEngine } from './src/game/gameEngine.js';
+import { createQuizEngine } from './src/game/quizEngine.js';
 import { createRenderer } from './src/ui/renderer.js';
 import { playRevealAnimation } from './src/ui/envelope.js';
 import { createModalController } from './src/ui/modal.js';
+import { createOpenFlowModalController } from './src/ui/openFlowModal.js';
 import { createQuizModalController } from './src/ui/quizModal.js';
 import { createConfettiController } from './src/effects/confetti.js';
 import { createSoundController } from './src/effects/sound.js';
@@ -11,6 +13,7 @@ import { vibrate } from './src/effects/vibration.js';
 
 const renderer = createRenderer();
 const modal = createModalController();
+const openFlow = createOpenFlowModalController();
 const quizModal = createQuizModalController();
 const confetti = createConfettiController();
 const sounds = createSoundController();
@@ -18,59 +21,154 @@ const game = createGameEngine(eventBus);
 
 let lastSpeechAt = 0;
 let openingInProgress = false;
+const preOpenQuiz = createQuizEngine();
 
-function buildShareText(result) {
-    const streakLine = result.streak > 0 ? `🔥 Chuỗi may mắn: x${result.streak}` : '🔥 Chuỗi may mắn: reset';
-    const claimLine = result.type === 'money'
-        ? (result.claimNote ?? '📸 Chụp ảnh màn hình gửi chủ thớt để lĩnh xèng nha!')
-        : null;
+const preOpenState = {
+    activeQuiz: false,
+    played: 0,
+    correct: 0
+};
 
-    const lines = [
-        '🧧 Máy Lì Xì PRO++',
-        result.title,
-        result.text,
-        streakLine,
-        result.blessing ?? 'Chúc bạn năm mới nhiều may mắn và bình an! ✨'
-    ];
+const gateRefs = {
+    screen: null,
+    subtitle: null,
+    openAt: null,
+    stats: null,
+    days: null,
+    hours: null,
+    minutes: null,
+    seconds: null,
+    quizBtn: null,
+    enterBtn: null
+};
 
-    if (claimLine) {
-        lines.push(claimLine);
-    }
+let gateTimerId;
+let quizContext = 'game';
 
-    lines.push('', `Thử vận may tại đây: ${window.location.href}`);
-    return lines.join('\n');
+function cacheGateRefs() {
+    gateRefs.screen = document.getElementById('opening-screen');
+    gateRefs.subtitle = document.getElementById('opening-subtitle');
+    gateRefs.openAt = document.getElementById('opening-open-at');
+    gateRefs.stats = document.getElementById('opening-quiz-stats');
+    gateRefs.days = document.getElementById('opening-days');
+    gateRefs.hours = document.getElementById('opening-hours');
+    gateRefs.minutes = document.getElementById('opening-minutes');
+    gateRefs.seconds = document.getElementById('opening-seconds');
+    gateRefs.quizBtn = document.getElementById('opening-quiz-btn');
+    gateRefs.enterBtn = document.getElementById('opening-enter-btn');
 }
 
-async function shareResult(result) {
-    if (!result) {
+function isOpenGateEnabled() {
+    return APP_CONFIG.openGate.enabled === true && Number.isFinite(APP_CONFIG.openGate.openAtMs);
+}
+
+function hasOpenGatePassed() {
+    if (!isOpenGateEnabled()) {
+        return true;
+    }
+
+    return Date.now() >= APP_CONFIG.openGate.openAtMs;
+}
+
+function formatCountdownParts(diffMs) {
+    const safe = Math.max(0, diffMs);
+    const days = Math.floor(safe / (24 * 60 * 60 * 1000));
+    const hours = Math.floor((safe % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    const minutes = Math.floor((safe % (60 * 60 * 1000)) / (60 * 1000));
+    const seconds = Math.floor((safe % (60 * 1000)) / 1000);
+
+    return {
+        days,
+        hours,
+        minutes,
+        seconds
+    };
+}
+
+function formatUnit(value) {
+    return String(value).padStart(2, '0');
+}
+
+function updatePreOpenStats() {
+    if (!gateRefs.stats) {
         return;
     }
 
-    const text = buildShareText(result);
+    gateRefs.stats.textContent = `🎯 Quiz chờ mở cửa: ${preOpenState.correct}/${preOpenState.played} câu đúng`;
+}
 
-    if (navigator.share) {
-        try {
-            await navigator.share({
-                title: 'Máy Lì Xì PRO++',
-                text
-            });
-            return;
-        } catch {
-            // Fallback to clipboard.
-        }
+function updateOpenGateCountdown() {
+    if (!isOpenGateEnabled()) {
+        return;
     }
 
-    if (navigator.clipboard) {
-        try {
-            await navigator.clipboard.writeText(text);
-            modal.showShareFeedback('✅ Đã copy!');
-            return;
-        } catch {
-            // Keep fallback message below.
-        }
+    const diff = APP_CONFIG.openGate.openAtMs - Date.now();
+    const countdown = formatCountdownParts(diff);
+
+    gateRefs.days.textContent = formatUnit(countdown.days);
+    gateRefs.hours.textContent = formatUnit(countdown.hours);
+    gateRefs.minutes.textContent = formatUnit(countdown.minutes);
+    gateRefs.seconds.textContent = formatUnit(countdown.seconds);
+
+    if (diff <= 0) {
+        stopOpenGateCountdown();
+        gateRefs.subtitle.textContent = '🎉 Đã đến giờ mở cổng lộc, vào bốc bao thôi!';
+        gateRefs.enterBtn.classList.remove('hidden');
+        gateRefs.quizBtn.classList.add('hidden');
+    }
+}
+
+function startOpenGateCountdown() {
+    stopOpenGateCountdown();
+    updateOpenGateCountdown();
+    gateTimerId = window.setInterval(updateOpenGateCountdown, 1000);
+}
+
+function stopOpenGateCountdown() {
+    if (gateTimerId) {
+        clearInterval(gateTimerId);
+        gateTimerId = undefined;
+    }
+}
+
+function showOpenGateScreen() {
+    if (!isOpenGateEnabled()) {
+        return false;
     }
 
-    modal.showShareFeedback('❌ Trình duyệt chặn share');
+    if (hasOpenGatePassed()) {
+        stopOpenGateCountdown();
+        return false;
+    }
+
+    modal.hide();
+    openFlow.close();
+    quizModal.close();
+
+    const openAtText = new Date(APP_CONFIG.openGate.openAtMs).toLocaleString('vi-VN', {
+        hour12: false
+    });
+
+    gateRefs.subtitle.textContent = 'Web sẽ mở đúng giờ khai xuân. Trong lúc chờ, bạn có thể chơi quiz cho vui nè!';
+    gateRefs.openAt.textContent = `🕒 Giờ mở cổng: ${openAtText}`;
+    gateRefs.enterBtn.classList.add('hidden');
+    gateRefs.quizBtn.classList.toggle('hidden', APP_CONFIG.openGate.allowQuizWhileWaiting !== true);
+    updatePreOpenStats();
+
+    renderer.showScreen('opening-screen');
+    startOpenGateCountdown();
+    return true;
+}
+
+function openPreOpenQuizPicker() {
+    quizContext = 'pre_open';
+    preOpenState.activeQuiz = true;
+    const quizKinds = preOpenQuiz.getQuizKinds();
+
+    quizModal.openCategoryPicker(quizKinds, {
+        attemptsUsed: preOpenState.played,
+        maxAttempts: Math.max(1, preOpenState.played + 1)
+    });
 }
 
 function getEnvelopeHandlers() {
@@ -81,6 +179,14 @@ function getEnvelopeHandlers() {
     };
 }
 
+function shouldUseFinalConfirm() {
+    if (APP_CONFIG.openFlow.finalStepEnabled !== true) {
+        return false;
+    }
+
+    return Math.random() < APP_CONFIG.openFlow.finalStepChance;
+}
+
 function renderCurrentGrid() {
     renderer.renderEnvelopes(game.getState().envelopes, getEnvelopeHandlers());
     renderer.showScreen('game-screen');
@@ -88,6 +194,7 @@ function renderCurrentGrid() {
 
 function showLockedState(payload) {
     modal.hide();
+    openFlow.close();
     quizModal.close();
     renderer.showLockedScreen(payload);
 }
@@ -111,6 +218,7 @@ function maybeShowExtraChancePrompt() {
     }
 
     modal.hide();
+    openFlow.close();
     quizModal.close();
 
     renderer.showExtraChanceScreen(
@@ -127,11 +235,15 @@ function maybeShowExtraChancePrompt() {
 }
 
 function openQuizKindPicker() {
+    quizContext = 'game';
+    preOpenState.activeQuiz = false;
     const quizKinds = game.getQuizKinds();
     quizModal.openCategoryPicker(quizKinds, game.getQuizStatus());
 }
 
 function handleRoundReady(payload) {
+    stopOpenGateCountdown();
+    openFlow.close();
     renderer.renderEnvelopes(payload.envelopes, getEnvelopeHandlers());
     renderer.showScreen('game-screen');
 }
@@ -150,7 +262,35 @@ function handleEnvelopeHover() {
     renderer.showSpeech(game.getHoverQuote());
 }
 
-async function handleEnvelopeOpen(payload) {
+function handleEnvelopeOpenRequest(payload) {
+    if (openingInProgress || !payload) {
+        return;
+    }
+
+    const envelope = game.getEnvelopePreview(payload.index);
+    if (!envelope || envelope.opened) {
+        return;
+    }
+
+    if (APP_CONFIG.openFlow.mode === 'QUICK') {
+        eventBus.emit('ui:open-envelope-confirmed', payload);
+        return;
+    }
+
+    renderer.hideSpeech(true);
+
+    openFlow.open({
+        index: payload.index,
+        element: payload.element,
+        faceEmoji: envelope.face?.emoji ?? '🧧',
+        faceLabel: envelope.face?.label ?? 'Bao li xi',
+        quote: game.getHoverQuote(),
+        talkStepEnabled: APP_CONFIG.openFlow.talkStepEnabled,
+        showFinalConfirm: shouldUseFinalConfirm()
+    });
+}
+
+async function handleEnvelopeOpenConfirmed(payload) {
     if (openingInProgress) {
         return;
     }
@@ -158,6 +298,7 @@ async function handleEnvelopeOpen(payload) {
     const { index, element } = payload;
     const result = game.openEnvelope(index);
     if (!result) {
+        maybeShowLockedState();
         return;
     }
 
@@ -165,6 +306,7 @@ async function handleEnvelopeOpen(payload) {
     game.setBusy(true);
 
     try {
+        openFlow.close();
         renderer.markEnvelopeOpened(element);
         renderer.hideSpeech(true);
 
@@ -197,11 +339,25 @@ function handleStartQuiz() {
     }
 
     modal.hide();
+    openFlow.close();
     openQuizKindPicker();
 }
 
 function handleQuizKindSelected(payload) {
     if (!payload?.quizKind) {
+        return;
+    }
+
+    if (quizContext === 'pre_open') {
+        const question = preOpenQuiz.start(payload.quizKind);
+        if (!question) {
+            return;
+        }
+
+        quizModal.openQuestion(question, {
+            attemptsUsed: preOpenState.played,
+            maxAttempts: Math.max(1, preOpenState.played + 1)
+        });
         return;
     }
 
@@ -214,6 +370,32 @@ function handleQuizKindSelected(payload) {
 }
 
 function handleQuizAnswer(payload) {
+    if (quizContext === 'pre_open') {
+        const evaluation = preOpenQuiz.submit(payload);
+        if (!evaluation) {
+            return;
+        }
+
+        preOpenState.played += 1;
+        if (evaluation.correct) {
+            preOpenState.correct += 1;
+        }
+
+        updatePreOpenStats();
+
+        quizModal.showFeedback({
+            correct: evaluation.correct,
+            title: evaluation.correct ? '🎉 Chính xác!' : '😆 Hụt nhẹ rồi!',
+            message: evaluation.correct
+                ? 'Bạn trả lời chuẩn luôn. Chơi thêm câu khác trong lúc chờ nha!'
+                : 'Không sao, làm thêm câu nữa để lấy hên nè!',
+            continueLabel: '🎯 Chơi câu khác',
+            canRetryQuiz: false
+        });
+
+        return;
+    }
+
     const feedback = game.submitQuizAnswer(payload);
     if (!feedback) {
         return;
@@ -223,6 +405,19 @@ function handleQuizAnswer(payload) {
 }
 
 function handleQuizContinue() {
+    if (quizContext === 'pre_open') {
+        if (hasOpenGatePassed()) {
+            quizModal.close();
+            preOpenState.activeQuiz = false;
+            quizContext = 'game';
+            game.startSession();
+            return;
+        }
+
+        openPreOpenQuizPicker();
+        return;
+    }
+
     if (game.hasUnlockedExtraChance()) {
         quizModal.close();
         renderCurrentGrid();
@@ -246,8 +441,23 @@ function handleQuizContinue() {
 }
 
 function handleQuizCancel() {
+    if (quizContext === 'pre_open') {
+        preOpenQuiz.clear();
+        preOpenState.activeQuiz = false;
+        quizContext = 'game';
+        quizModal.close();
+
+        if (showOpenGateScreen()) {
+            return;
+        }
+
+        game.startSession();
+        return;
+    }
+
     game.cancelQuizChallenge();
     quizModal.close();
+    openFlow.close();
 
     if (maybeShowExtraChancePrompt()) {
         return;
@@ -258,6 +468,7 @@ function handleQuizCancel() {
 
 function handlePlayAgain() {
     modal.hide();
+    openFlow.close();
 
     const currentResult = game.getState().currentResult;
     if (game.canOfferExtraChance() && currentResult?.type === 'money') {
@@ -280,6 +491,7 @@ function handlePlayAgain() {
 
 function handleCloseModal() {
     modal.hide();
+    openFlow.close();
 
     if (maybeShowExtraChancePrompt()) {
         return;
@@ -288,8 +500,30 @@ function handleCloseModal() {
     maybeShowLockedState();
 }
 
+function handleStartIntent() {
+    if (showOpenGateScreen()) {
+        return;
+    }
+
+    game.startSession();
+}
+
+function handleEnterFromOpenGate() {
+    if (!hasOpenGatePassed()) {
+        showOpenGateScreen();
+        return;
+    }
+
+    stopOpenGateCountdown();
+    quizModal.close();
+    preOpenState.activeQuiz = false;
+    quizContext = 'game';
+    game.startSession();
+}
+
 function bootstrap() {
     sounds.init();
+    cacheGateRefs();
 
     renderer.init(
         {
@@ -303,8 +537,20 @@ function bootstrap() {
     modal.init({
         onClose: () => eventBus.emit('ui:modal-close'),
         onPlayAgain: () => eventBus.emit('ui:play-again'),
-        onShare: (result) => eventBus.emit('ui:share-result', { result }),
         onExtraChance: () => eventBus.emit('ui:start-quiz')
+    });
+
+    openFlow.init({
+        onOpen: () => {
+            sounds.playClick();
+        },
+        onStepChange: (step) => {
+            if (step === 'FINAL_CONFIRM') {
+                vibrate(48);
+            }
+        },
+        onConfirm: (payload) => eventBus.emit('ui:open-envelope-confirmed', payload),
+        onCancel: () => renderer.hideSpeech(true)
     });
 
     quizModal.init({
@@ -314,15 +560,26 @@ function bootstrap() {
         onContinue: () => eventBus.emit('ui:quiz-continue')
     });
 
-    eventBus.on('ui:start', () => game.startSession());
+    gateRefs.quizBtn?.addEventListener('click', () => {
+        if (APP_CONFIG.openGate.allowQuizWhileWaiting !== true) {
+            return;
+        }
+
+        openPreOpenQuizPicker();
+    });
+
+    gateRefs.enterBtn?.addEventListener('click', handleEnterFromOpenGate);
+
+    eventBus.on('ui:start', handleStartIntent);
     eventBus.on('round:ready', handleRoundReady);
     eventBus.on('state:updated', handleStateUpdated);
     eventBus.on('session:locked', showLockedState);
 
     eventBus.on('ui:hover-envelope', handleEnvelopeHover);
     eventBus.on('ui:hover-leave', () => renderer.hideSpeech(false));
-    eventBus.on('ui:open-envelope', (payload) => {
-        void handleEnvelopeOpen(payload);
+    eventBus.on('ui:open-envelope', handleEnvelopeOpenRequest);
+    eventBus.on('ui:open-envelope-confirmed', (payload) => {
+        void handleEnvelopeOpenConfirmed(payload);
     });
 
     eventBus.on('ui:start-quiz', handleStartQuiz);
@@ -333,9 +590,6 @@ function bootstrap() {
 
     eventBus.on('ui:play-again', handlePlayAgain);
     eventBus.on('ui:modal-close', handleCloseModal);
-    eventBus.on('ui:share-result', (payload) => {
-        void shareResult(payload.result);
-    });
 
     renderer.showScreen('welcome-screen');
     window.addEventListener('load', () => sounds.preload());

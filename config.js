@@ -24,6 +24,31 @@
     // LOCKED mode: cho phep mini-quiz de them 1 co hoi.
     ENABLE_EXTRA_CHANCE_QUIZ: true,
     QUIZ_MAX_ATTEMPTS: 3,
+    // Khong lap lai cau quiz da tung hien tren cung 1 thiet bi.
+    QUIZ_UNIQUE_PER_DEVICE: true,
+    QUIZ_SEEN_STORAGE_KEY: 'lixi_quiz_seen_v1',
+
+    // ===== OPEN FLOW (MOBILE-FIRST) =====
+    // QUICK: click mo ngay (bo qua popup xac nhan)
+    // DRAMA: 2-3 lop popup truoc khi mo
+    OPEN_FLOW_MODE: 'DRAMA',
+    DRAMA_OPEN_FLOW: true,
+    DRAMA_TALK_STEP: true,
+    DRAMA_FINAL_STEP: true,
+    // Ti le random hien buoc FINAL (0 -> 1). Vi du 0.4 = 40%
+    OPEN_FLOW_FINAL_RANDOM_CHANCE: 0.4,
+    // Dẫn link ảnh trong thư mục assets (nếu để null thì dùng emoji mặc định)
+    // Ví dụ: '/assets/images/confirm-face.png'
+    OPEN_FLOW_CONFIRM_FACE_IMAGE: '/assets/images/suynghi.jpg',
+    OPEN_FLOW_FINAL_FACE_IMAGE: null,
+
+    // ===== OPEN GATE (THOI GIAN MO CUA WEB) =====
+    // Bat/tat che do cho mo cua theo thoi gian.
+    OPEN_GATE_ENABLED: true,
+    // Dinh dang de xuat: '2026-02-20T20:00:00+07:00'
+    OPEN_GATE_AT: '2026-02-17T00:00:00+07:00',
+    // Cho phep choi quiz trong luc cho mo cua.
+    OPEN_GATE_ALLOW_QUIZ: true,
 
     // ===== GAME BALANCE =====
     TOTAL_ENVELOPES: 10,

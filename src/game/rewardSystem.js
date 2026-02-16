@@ -26,7 +26,7 @@ const HOVER_QUOTES = [
     'Đừng ngại, cứ bốc tui đi 😉',
     'Tui tuy nhỏ nhưng tiền nhiều 💸',
     'Hôm nay vận may đứng ngay trong tui 😎',
-    'Bốc tui xong nhớ khoe với bạn bè nha 📸'
+    'Bốc tui xong nhớ giữ phong độ may mắn nha ✨'
 ];
 
 const MONEY_REWARDS = ['99.999đ', '50.000đ', '100.000đ', '80.000đ'];

@@ -36,6 +36,33 @@ function asBooleanTrue(value) {
     return value === true;
 }
 
+function asOptionalString(value) {
+    if (typeof value !== 'string') {
+        return null;
+    }
+
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}
+
+function asTimestampMs(value) {
+    if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+        return value;
+    }
+
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return null;
+        }
+
+        const parsed = Date.parse(trimmed);
+        return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+}
+
 function normalizeMode(rawMode) {
     if (typeof rawMode !== 'string') {
         return null;
@@ -48,6 +75,19 @@ function normalizeMode(rawMode) {
 
     if (value === 'ONE_TIME' || value === 'ONETIME') {
         return GAME_MODES.LOCKED;
+    }
+
+    return null;
+}
+
+function normalizeOpenFlowMode(rawMode) {
+    if (typeof rawMode !== 'string') {
+        return null;
+    }
+
+    const value = rawMode.trim().toUpperCase();
+    if (value === 'QUICK' || value === 'DRAMA') {
+        return value;
     }
 
     return null;
@@ -123,6 +163,9 @@ const runtimeMode = resolveModeFromQuery(allowQueryOverride)
     ?? configuredModeFromText
     ?? GAME_MODES.LOCKED;
 
+const openFlowMode = normalizeOpenFlowMode(globalConfig.OPEN_FLOW_MODE)
+    ?? (globalConfig.DRAMA_OPEN_FLOW === false ? 'QUICK' : 'DRAMA');
+
 const trollChance = asProbability(globalConfig.TROLL_CHANCE, 0.2);
 const configuredMoneyChance = asProbability(globalConfig.MONEY_CHANCE, 0.4);
 const moneyChance = Math.min(1 - trollChance, configuredMoneyChance);
@@ -155,6 +198,19 @@ export const APP_CONFIG = {
     quiz: {
         enabledInLockedMode: globalConfig.ENABLE_EXTRA_CHANCE_QUIZ !== false,
         maxAttempts: asPositiveNumber(globalConfig.QUIZ_MAX_ATTEMPTS, 3)
+    },
+    openFlow: {
+        mode: openFlowMode,
+        talkStepEnabled: globalConfig.DRAMA_TALK_STEP !== false,
+        finalStepEnabled: globalConfig.DRAMA_FINAL_STEP !== false,
+        finalStepChance: asProbability(globalConfig.OPEN_FLOW_FINAL_RANDOM_CHANCE, 0.45),
+        confirmFaceImage: asOptionalString(globalConfig.OPEN_FLOW_CONFIRM_FACE_IMAGE),
+        finalFaceImage: asOptionalString(globalConfig.OPEN_FLOW_FINAL_FACE_IMAGE)
+    },
+    openGate: {
+        enabled: globalConfig.OPEN_GATE_ENABLED === true,
+        openAtMs: asTimestampMs(globalConfig.OPEN_GATE_AT),
+        allowQuizWhileWaiting: globalConfig.OPEN_GATE_ALLOW_QUIZ !== false
     },
     gameMode: {
         mode: runtimeMode,

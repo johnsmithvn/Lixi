@@ -4,7 +4,6 @@ export function createModalController() {
     const refs = {};
     let latestResult = null;
     let trollRevealTimer;
-    let shareFeedbackTimer;
 
     function cacheRefs() {
         refs.modal = document.getElementById('result-modal');
@@ -17,18 +16,12 @@ export function createModalController() {
 
         refs.extraChanceBtn = document.getElementById('extra-chance-btn');
         refs.playAgainBtn = document.getElementById('play-again-btn');
-        refs.shareBtn = document.getElementById('share-btn');
     }
 
     function clearTimers() {
         if (trollRevealTimer) {
             clearTimeout(trollRevealTimer);
             trollRevealTimer = undefined;
-        }
-
-        if (shareFeedbackTimer) {
-            clearTimeout(shareFeedbackTimer);
-            shareFeedbackTimer = undefined;
         }
     }
 
@@ -37,7 +30,6 @@ export function createModalController() {
 
         refs.extraChanceBtn.addEventListener('click', handlers.onExtraChance);
         refs.playAgainBtn.addEventListener('click', handlers.onPlayAgain);
-        refs.shareBtn.addEventListener('click', () => handlers.onShare(latestResult));
 
         refs.modal.addEventListener('click', (event) => {
             const target = event.target;
@@ -95,24 +87,14 @@ export function createModalController() {
         clearTimers();
         refs.modal.classList.add('hidden');
         document.body.classList.remove('modal-open');
-        refs.shareBtn.textContent = '📤 Gửi cho bạn bè troll';
         refs.extraChanceBtn.classList.add('hidden');
         refs.resultClaimNote.classList.add('hidden');
-    }
-
-    function showShareFeedback(message) {
-        refs.shareBtn.textContent = message;
-        clearTimeout(shareFeedbackTimer);
-        shareFeedbackTimer = window.setTimeout(() => {
-            refs.shareBtn.textContent = '📤 Gửi cho bạn bè troll';
-        }, 1800);
     }
 
     return {
         init,
         show,
         hide,
-        showShareFeedback,
         getLatestResult: () => latestResult
     };
 }

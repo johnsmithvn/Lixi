@@ -41,6 +41,41 @@
                 <span id="speech-text"></span>
             </div>
         </section>
+
+        <section id="opening-screen" class="screen">
+            <article class="opening-card">
+                <p class="opening-badge">⏳ Cổng lộc chưa mở</p>
+                <h2 class="opening-title">Chưa đến giờ khai xuân rồi nè!</h2>
+                <p id="opening-subtitle" class="opening-subtitle"></p>
+
+                <div class="opening-countdown">
+                    <div class="opening-unit">
+                        <span id="opening-days">0</span>
+                        <small>Ngày</small>
+                    </div>
+                    <div class="opening-unit">
+                        <span id="opening-hours">0</span>
+                        <small>Giờ</small>
+                    </div>
+                    <div class="opening-unit">
+                        <span id="opening-minutes">0</span>
+                        <small>Phút</small>
+                    </div>
+                    <div class="opening-unit">
+                        <span id="opening-seconds">0</span>
+                        <small>Giây</small>
+                    </div>
+                </div>
+
+                <p id="opening-open-at" class="opening-open-at"></p>
+                <p id="opening-quiz-stats" class="opening-quiz-stats"></p>
+
+                <div class="opening-actions">
+                    <button id="opening-quiz-btn" class="opening-quiz-btn" type="button">🧠 Chơi quiz trong lúc chờ</button>
+                    <button id="opening-enter-btn" class="opening-enter-btn hidden" type="button">🧧 Vào mở lì xì ngay</button>
+                </div>
+            </article>
+        </section>
     </div>
 
     <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="result-main">
@@ -56,9 +91,23 @@
             <div class="modal-actions">
                 <button id="extra-chance-btn" class="btn-extra hidden" type="button">🎯 Thử vận may lần nữa</button>
                 <button id="play-again-btn" class="btn-again" type="button">🔄 Bốc lại nào!</button>
-                <button id="share-btn" class="btn-share" type="button">📤 Gửi cho bạn bè troll</button>
             </div>
         </div>
+    </div>
+
+    <div id="open-flow-modal" class="open-flow-modal hidden" role="dialog" aria-modal="true" aria-labelledby="open-flow-title">
+        <div class="open-flow-backdrop" data-close-open-flow="true"></div>
+        <article id="open-flow-sheet" class="open-flow-sheet">
+            <p id="open-flow-step" class="open-flow-step"></p>
+            <p id="open-flow-face" class="open-flow-face"></p>
+            <h3 id="open-flow-title" class="open-flow-title"></h3>
+            <p id="open-flow-message" class="open-flow-message"></p>
+
+            <div class="open-flow-actions">
+                <button id="open-flow-primary" class="open-flow-primary" type="button"></button>
+                <button id="open-flow-secondary" class="open-flow-secondary" type="button"></button>
+            </div>
+        </article>
     </div>
 
     <div id="quiz-modal" class="quiz-modal hidden" role="dialog" aria-modal="true" aria-labelledby="quiz-question">

@@ -18,6 +18,44 @@ function normalizeText(raw) {
         .replace(/[^A-Z0-9]/g, '');
 }
 
+function normalizeTextKeepSpaces(raw) {
+    return String(raw ?? '')
+        .toUpperCase()
+        .replace(/[Đ]/g, 'D')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function normalizeDisplayTextKeepSpaces(raw) {
+    return String(raw ?? '')
+        .toUpperCase()
+        .normalize('NFC')
+        .replace(/[^0-9A-ZÀ-ỸĐ\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function getWordTokens(raw) {
+    const normalized = normalizeTextKeepSpaces(raw);
+    if (!normalized) {
+        return [];
+    }
+
+    return normalized.split(' ').filter(Boolean);
+}
+
+function getDisplayWordTokens(raw) {
+    const normalized = normalizeDisplayTextKeepSpaces(raw);
+    if (!normalized) {
+        return [];
+    }
+
+    return normalized.split(' ').filter(Boolean);
+}
+
 function shuffleLetters(rawWord) {
     const letters = rawWord.split('');
 
@@ -33,6 +71,21 @@ function shuffleLetters(rawWord) {
 
 function toSpacedWord(word) {
     return word.split('').join(' ');
+}
+
+function toGroupedSpacedWord(word, wordLengths = []) {
+    if (!Array.isArray(wordLengths) || wordLengths.length === 0) {
+        return toSpacedWord(word);
+    }
+
+    let cursor = 0;
+    const groups = wordLengths.map((length) => {
+        const segment = word.slice(cursor, cursor + length);
+        cursor += length;
+        return segment ? segment.split('').join(' ') : '';
+    }).filter(Boolean);
+
+    return groups.join('   ');
 }
 
 function sanitizeChoiceQuestion(question) {
@@ -66,10 +119,16 @@ function sanitizeWordPuzzle(question) {
         return null;
     }
 
-    const answer = normalizeText(question.answer);
+    const wordTokens = getWordTokens(question.answer);
+    const answer = wordTokens.join('');
     if (!answer || answer.length < 2) {
         return null;
     }
+
+    const displayWordTokens = getDisplayWordTokens(question.answer);
+    const safeDisplayTokens = displayWordTokens.length > 0 ? displayWordTokens : wordTokens;
+    const displayAnswer = safeDisplayTokens.join('');
+    const wordLengths = safeDisplayTokens.map((token) => token.length).filter((length) => length > 0);
 
     return {
         id: question.id,
@@ -78,6 +137,9 @@ function sanitizeWordPuzzle(question) {
         question: question.question,
         hint: question.hint,
         answer,
+        displayAnswer,
+        wordLengths,
+        wordCount: wordLengths.length,
         placeholder: question.placeholder ?? 'Nhập đáp án không dấu...'
     };
 }
@@ -87,11 +149,11 @@ function buildWordQuestion(baseQuestion) {
         return null;
     }
 
-    let scrambled = baseQuestion.answer;
+    let scrambled = baseQuestion.displayAnswer;
     let attempt = 0;
 
-    while (scrambled === baseQuestion.answer && attempt < 8) {
-        scrambled = shuffleLetters(baseQuestion.answer);
+    while (normalizeText(scrambled) === baseQuestion.answer && attempt < 8) {
+        scrambled = shuffleLetters(baseQuestion.displayAnswer);
         attempt += 1;
     }
 
@@ -102,7 +164,9 @@ function buildWordQuestion(baseQuestion) {
         question: baseQuestion.question,
         hint: baseQuestion.hint,
         letters: scrambled.split(''),
-        scrambled: toSpacedWord(scrambled),
+        scrambled: toGroupedSpacedWord(scrambled, baseQuestion.wordLengths),
+        wordLengths: baseQuestion.wordLengths,
+        wordCount: baseQuestion.wordCount,
         placeholder: baseQuestion.placeholder,
         normalizedAnswer: baseQuestion.answer
     };

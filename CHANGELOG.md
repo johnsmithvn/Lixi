@@ -17,9 +17,95 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.6.3`
+**Current:** `0.8.1`
 
 ## 4. Lich su thay doi
+
+## [0.8.1] - 2026-02-16
+
+### Changed
+- Viet hoa lai UI quiz theo tieng Viet de de hieu hon:
+  - `🔤 Word Puzzle` -> `🔤 Xếp chữ Tết`
+  - Label/chu trong modal quiz hien thi tieng Viet day du.
+- Bo du lieu `WORD_PUZZLE_SET` cho phep dap an co khoang trang (vi du: `HOA MAI`, `BÁNH CHƯNG`, `LÌ XÌ`).
+- Word Puzzle hien thi chu cai co dau (neu dap an co dau), trong khi logic cham diem van normalize de on dinh.
+
+### Fixed
+- Sua hien thi chu bi loi ma hoa trong quiz modal (chu tieng Viet bi vo dau/sai ky tu).
+- Word Puzzle hien thi tach cum tu ro rang hon:
+  - Chu xao tron duoc nhom theo tung tu.
+  - O dien dap an co khoang ngat giua cac tu.
+
+## [0.8.0] - 2026-02-16
+
+### Added
+- Them config mo cua theo gio:
+  - `OPEN_GATE_ENABLED`
+  - `OPEN_GATE_AT`
+  - `OPEN_GATE_ALLOW_QUIZ`
+- Them man hinh `opening-screen` dem nguoc den gio mo cua.
+- Trong luc cho mo cua, user co the choi mini-quiz (neu bat config).
+
+### Changed
+- `main.js` doi flow bat dau game:
+  - Neu chua den gio mo cua thi vao man hinh dem nguoc.
+  - Den gio mo cua moi vao game.
+- Cap nhat README de mo ta ro config `OPEN_GATE_*`.
+
+### Fixed
+- Loai bo hoan toan luong "gui ket qua cho ban be/share" khoi UI va controller.
+- Don dep CSS du thua cua button share.
+
+## [0.7.3] - 2026-02-16
+
+### Changed
+- Loai bo hoan toan co che `showShareFeedback` trong flow share result.
+- Nút share khong doi text tam thoi sau khi copy/share nua.
+
+### Fixed
+- Chinh `open-flow-modal` can giua man hinh (desktop + mobile), khong con bi dinh sat phan duoi.
+
+## [0.7.2] - 2026-02-16
+
+### Changed
+- `FLOW_FINAL` doi sang co che hien ngau nhien, khong con phu thuoc vao ket qua `money/troll`.
+- Them config `OPEN_FLOW_FINAL_RANDOM_CHANCE` de chinh ti le hien buoc final.
+
+## [0.7.1] - 2026-02-16
+
+### Added
+- Ho tro dung anh asset cho icon trong open-flow modal:
+  - `OPEN_FLOW_CONFIRM_FACE_IMAGE`
+  - `OPEN_FLOW_FINAL_FACE_IMAGE`
+- Them style rieng cho avatar anh trong open-flow (`.open-flow-face-image`).
+
+### Changed
+- Chuan hoa lai noi dung text trong `src/ui/openFlowModal.js` sang tieng Viet co dau.
+- Neu co anh config thi uu tien hien anh, neu khong se fallback ve emoji mac dinh.
+
+## [0.7.0] - 2026-02-16
+
+### Added
+- Them `open flow modal` theo state machine de mo bao theo kieu mobile-first:
+  - `TALK`
+  - `CONFIRM`
+  - `FINAL_CONFIRM` (drama step)
+- Them module moi: `src/ui/openFlowModal.js`.
+- Them config de bat/tat luong drama:
+  - `OPEN_FLOW_MODE` (`QUICK` | `DRAMA`)
+  - `DRAMA_OPEN_FLOW`
+  - `DRAMA_TALK_STEP`
+  - `DRAMA_FINAL_STEP`
+
+### Changed
+- Click vao bao khong mo ngay nua (khi o `DRAMA`), ma di qua popup flow truoc.
+- `main.js` doi event flow:
+  - `ui:open-envelope` -> open flow
+  - `ui:open-envelope-confirmed` -> mo bao that su.
+- Them helper `getEnvelopePreview(index)` trong `src/game/gameEngine.js` de render noi dung popup theo bao da chon.
+
+### Fixed
+- Dong bo viec dong modal flow khi vao lock screen, extra chance screen, quiz va cac luong close modal khac, tranh overlap UI.
 
 ## [0.6.3] - 2026-02-16
 

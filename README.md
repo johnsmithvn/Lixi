@@ -16,12 +16,14 @@ Web mini-game li xi theo huong mobile-first, module architecture, va mode lock l
   - `troll`
   - `joke`
 - Streak system + best streak luu localStorage.
-- Share ket qua qua Web Share API (co fallback clipboard).
 - Mode system:
   - `FREE`
   - `LOCKED`
   - `EVENT`
   - `TEST`
+- Open gate theo gio:
+  - Neu chua den gio mo cua -> hien man hinh dem nguoc.
+  - Co the bat quiz trong luc cho mo cua.
 - LOCKED mode co `Quiz Extra Chance`:
   - Neu lan dau mo ra `troll`/`joke`, user duoc quiz 1 cau.
   - Dung: them 1 luot mo bao.
@@ -88,6 +90,10 @@ window.APP_CONFIG = {
   ENABLE_EXTRA_CHANCE_QUIZ: true,
   QUIZ_MAX_ATTEMPTS: 3,
 
+  OPEN_GATE_ENABLED: false,
+  OPEN_GATE_AT: '2026-02-20T20:00:00+07:00',
+  OPEN_GATE_ALLOW_QUIZ: true,
+
   TOTAL_ENVELOPES: 10,
   TROLL_CHANCE: 0.2,
   MONEY_CHANCE: 0.4,
@@ -108,6 +114,9 @@ Y nghia nhanh:
 - `ENABLE_LOCK: false` -> tuong duong free mode.
 - `ENABLE_EXTRA_CHANCE_QUIZ: false` -> tat mini-quiz extra chance.
 - `QUIZ_MAX_ATTEMPTS` -> so lan tra loi quiz toi da.
+- `OPEN_GATE_ENABLED: true` -> bat che do mo cua theo gio.
+- `OPEN_GATE_AT` -> thoi diem web cho phep vao game.
+- `OPEN_GATE_ALLOW_QUIZ: true` -> cho choi quiz khi dang cho mo cua.
 - `TOTAL_ENVELOPES` -> so bao li xi moi round.
 - `TROLL_CHANCE` -> ti le troll.
 - `MONEY_CHANCE` -> ti le tien (phan con lai la joke).

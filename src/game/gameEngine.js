@@ -355,6 +355,15 @@ export function createGameEngine(eventBus = defaultEventBus) {
         return state.openedCount >= APP_CONFIG.totalEnvelopes;
     }
 
+    function getEnvelopePreview(index) {
+        const idx = Number(index);
+        if (!Number.isInteger(idx) || idx < 0) {
+            return null;
+        }
+
+        return state.envelopes[idx] ?? null;
+    }
+
     return {
         startSession,
         startRound,
@@ -369,6 +378,7 @@ export function createGameEngine(eventBus = defaultEventBus) {
         getHoverQuote,
         getPetalSymbols,
         getState: snapshotState,
+        getEnvelopePreview,
         getGameMode: () => gameMode.mode,
         getActiveFate: () => gameMode.getActiveFate(),
         hasUnlockedExtraChance: () => state.extraChanceUnlocked,

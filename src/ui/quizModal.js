@@ -1,4 +1,4 @@
-function buildStepLabel(baseText, quizStatus) {
+﻿function buildStepLabel(baseText, quizStatus) {
     const maxAttempts = quizStatus?.maxAttempts ?? 3;
     const attemptsUsed = quizStatus?.attemptsUsed ?? 0;
     const nextAttempt = Math.min(maxAttempts, attemptsUsed + 1);
@@ -139,7 +139,7 @@ export function createQuizModalController() {
                 slotBtn.classList.add('filled');
                 slotBtn.textContent = wordState.letters[bankIndex];
             } else {
-                slotBtn.textContent = '•';
+                slotBtn.textContent = '·';
             }
 
             const canRemove = bankIndex !== null && !wordState.locked;
@@ -159,6 +159,13 @@ export function createQuizModalController() {
             }
 
             refs.wordSlots.appendChild(slotBtn);
+
+            if (wordState.breakpoints.has(slotIndex)) {
+                const gap = document.createElement('span');
+                gap.className = 'quiz-word-gap';
+                gap.setAttribute('aria-hidden', 'true');
+                refs.wordSlots.appendChild(gap);
+            }
         });
 
         wordState.letters.forEach((letter, bankIndex) => {
@@ -204,14 +211,34 @@ export function createQuizModalController() {
             ? question.letters.map((letter) => String(letter).toUpperCase())
             : String(question.scrambled ?? '').replace(/\s+/g, '').split('');
 
+        const rawWordLengths = Array.isArray(question.wordLengths)
+            ? question.wordLengths
+                .map((length) => Number(length))
+                .filter((length) => Number.isFinite(length) && length > 0)
+            : [];
+        const wordLengths = rawWordLengths.length > 0 ? rawWordLengths : [letters.length];
+        const breakpoints = [];
+        let cursor = 0;
+        for (let i = 0; i < wordLengths.length - 1; i += 1) {
+            cursor += wordLengths[i];
+            breakpoints.push(cursor - 1);
+        }
+
         wordState = {
             letters,
             slots: new Array(letters.length).fill(null),
             used: new Array(letters.length).fill(false),
-            locked: false
+            locked: false,
+            breakpoints: new Set(breakpoints)
         };
 
-        refs.wordHint.textContent = `Gợi ý: ${question.hint}`;
+        const wordCount = Number.isInteger(question.wordCount) && question.wordCount > 1
+            ? question.wordCount
+            : wordLengths.length;
+
+        refs.wordHint.textContent = wordCount > 1
+            ? `Gợi ý: ${question.hint} · Đáp án gồm ${wordCount} từ`
+            : `Gợi ý: ${question.hint}`;
         refs.wordScrambled.textContent = question.scrambled;
         refs.wordForm.classList.remove('hidden');
         refreshWordPuzzleUI();
@@ -269,7 +296,7 @@ export function createQuizModalController() {
         clearKindPicker();
 
         const baseLabel = question.quizKind === 'word'
-            ? '🔤 Word Puzzle'
+            ? '🔤 Xếp chữ Tết'
             : '🧠 Trắc nghiệm';
 
         refs.stepLabel.textContent = buildStepLabel(baseLabel, quizStatus);
@@ -332,7 +359,9 @@ export function createQuizModalController() {
         refs.feedback.classList.remove('hidden');
         refs.feedback.classList.add(feedback.correct ? 'quiz-feedback--ok' : 'quiz-feedback--miss');
 
-        if (feedback.correct) {
+        if (typeof feedback.continueLabel === 'string' && feedback.continueLabel.trim()) {
+            refs.continueBtn.textContent = feedback.continueLabel;
+        } else if (feedback.correct) {
             refs.continueBtn.textContent = '🧧 Mở bao tiếp';
         } else if (feedback.canRetryQuiz) {
             refs.continueBtn.textContent = `🎯 Thử câu khác (${feedback.remainingAttempts} lượt)`;
