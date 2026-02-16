@@ -22,6 +22,7 @@ const game = createGameEngine(eventBus);
 let lastSpeechAt = 0;
 let openingInProgress = false;
 const preOpenQuiz = createQuizEngine();
+const lockedFunQuiz = createQuizEngine();
 
 const preOpenState = {
     activeQuiz: false,
@@ -196,7 +197,11 @@ function showLockedState(payload) {
     modal.hide();
     openFlow.close();
     quizModal.close();
-    renderer.showLockedScreen(payload);
+    quizContext = 'game';
+    preOpenState.activeQuiz = false;
+    renderer.showLockedScreen(payload, {
+        onPlayQuiz: () => eventBus.emit('ui:start-locked-quiz')
+    });
 }
 
 function maybeShowLockedState() {
@@ -239,6 +244,32 @@ function openQuizKindPicker() {
     preOpenState.activeQuiz = false;
     const quizKinds = game.getQuizKinds();
     quizModal.openCategoryPicker(quizKinds, game.getQuizStatus());
+}
+
+function openLockedFunQuizPicker() {
+    quizContext = 'locked_fun';
+    const quizKinds = lockedFunQuiz.getQuizKinds();
+    quizModal.openCategoryPicker(quizKinds);
+}
+
+function handleNoMoreQuizQuestions() {
+    quizModal.close();
+
+    if (quizContext === 'pre_open') {
+        showOpenGateScreen();
+        gateRefs.subtitle.textContent = 'Bạn đã chơi hết câu hỏi mới trên thiết bị này rồi. Chờ mở cổng lộc nhé!';
+        return;
+    }
+
+    if (quizContext === 'locked_fun') {
+        maybeShowLockedState();
+        renderer.showSpeech('📚 Hết câu mới trên thiết bị này rồi, chơi lại sau nha!');
+        window.setTimeout(() => renderer.hideSpeech(true), 1800);
+        return;
+    }
+
+    renderer.showSpeech('📚 Hết câu hỏi mới trên thiết bị này rồi nè!');
+    window.setTimeout(() => renderer.hideSpeech(true), 1800);
 }
 
 function handleRoundReady(payload) {
@@ -343,6 +374,12 @@ function handleStartQuiz() {
     openQuizKindPicker();
 }
 
+function handleStartLockedQuiz() {
+    modal.hide();
+    openFlow.close();
+    openLockedFunQuizPicker();
+}
+
 function handleQuizKindSelected(payload) {
     if (!payload?.quizKind) {
         return;
@@ -351,6 +388,7 @@ function handleQuizKindSelected(payload) {
     if (quizContext === 'pre_open') {
         const question = preOpenQuiz.start(payload.quizKind);
         if (!question) {
+            handleNoMoreQuizQuestions();
             return;
         }
 
@@ -361,8 +399,20 @@ function handleQuizKindSelected(payload) {
         return;
     }
 
+    if (quizContext === 'locked_fun') {
+        const question = lockedFunQuiz.start(payload.quizKind);
+        if (!question) {
+            handleNoMoreQuizQuestions();
+            return;
+        }
+
+        quizModal.openQuestion(question);
+        return;
+    }
+
     const question = game.startQuizChallenge(payload.quizKind);
     if (!question) {
+        handleNoMoreQuizQuestions();
         return;
     }
 
@@ -384,8 +434,9 @@ function handleQuizAnswer(payload) {
         updatePreOpenStats();
 
         quizModal.showFeedback({
+            ...evaluation,
             correct: evaluation.correct,
-            title: evaluation.correct ? '🎉 Chính xác!' : '😆 Hụt nhẹ rồi!',
+            title: evaluation.correct ? 'Ê sao biết vậy!' : '😆 Sai một chút xíu xiu à!',
             message: evaluation.correct
                 ? 'Bạn trả lời chuẩn luôn. Chơi thêm câu khác trong lúc chờ nha!'
                 : 'Không sao, làm thêm câu nữa để lấy hên nè!',
@@ -393,6 +444,25 @@ function handleQuizAnswer(payload) {
             canRetryQuiz: false
         });
 
+        return;
+    }
+
+    if (quizContext === 'locked_fun') {
+        const evaluation = lockedFunQuiz.submit(payload);
+        if (!evaluation) {
+            return;
+        }
+
+        quizModal.showFeedback({
+            ...evaluation,
+            correct: evaluation.correct,
+            title: evaluation.correct ? '🎉 Chuẩn bài luôn!' : '😆 Trượt nhẹ thôi!',
+            message: evaluation.correct
+                ? 'Giải trí quá mượt, làm thêm câu nữa nhé!'
+                : 'Không tính điểm đâu, thử câu khác cho vui nè.',
+            continueLabel: '🎯 Câu khác',
+            canRetryQuiz: false
+        });
         return;
     }
 
@@ -418,10 +488,15 @@ function handleQuizContinue() {
         return;
     }
 
+    if (quizContext === 'locked_fun') {
+        openLockedFunQuizPicker();
+        return;
+    }
+
     if (game.hasUnlockedExtraChance()) {
         quizModal.close();
         renderCurrentGrid();
-        renderer.showSpeech('🎯 Chính xác! Bạn có thêm 1 cơ hội mở bao nhé.');
+        renderer.showSpeech('🎯 Nice xừ! Bạn có thêm 1 cơ hội mở bao nhé.');
         window.setTimeout(() => renderer.hideSpeech(true), 1600);
         return;
     }
@@ -452,6 +527,14 @@ function handleQuizCancel() {
         }
 
         game.startSession();
+        return;
+    }
+
+    if (quizContext === 'locked_fun') {
+        lockedFunQuiz.clear();
+        quizContext = 'game';
+        quizModal.close();
+        maybeShowLockedState();
         return;
     }
 
@@ -583,6 +666,7 @@ function bootstrap() {
     });
 
     eventBus.on('ui:start-quiz', handleStartQuiz);
+    eventBus.on('ui:start-locked-quiz', handleStartLockedQuiz);
     eventBus.on('ui:quiz-kind-selected', handleQuizKindSelected);
     eventBus.on('ui:quiz-answer', handleQuizAnswer);
     eventBus.on('ui:quiz-continue', handleQuizContinue);

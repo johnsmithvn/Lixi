@@ -193,11 +193,13 @@ export const APP_CONFIG = {
         }
     },
     storage: {
-        bestStreakKey: 'lixi_best_streak_v1'
+        bestStreakKey: 'lixi_best_streak_v1',
+        quizSeenKey: globalConfig.QUIZ_SEEN_STORAGE_KEY ?? 'lixi_quiz_seen_v1'
     },
     quiz: {
         enabledInLockedMode: globalConfig.ENABLE_EXTRA_CHANCE_QUIZ !== false,
-        maxAttempts: asPositiveNumber(globalConfig.QUIZ_MAX_ATTEMPTS, 3)
+        maxAttempts: asPositiveNumber(globalConfig.QUIZ_MAX_ATTEMPTS, 3),
+        uniquePerDevice: globalConfig.QUIZ_UNIQUE_PER_DEVICE !== false
     },
     openFlow: {
         mode: openFlowMode,

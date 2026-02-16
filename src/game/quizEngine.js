@@ -4,9 +4,72 @@
     QUIZ_KIND_OPTIONS,
     WORD_PUZZLE_SET
 } from './quizData.js';
+import { APP_CONFIG } from '../core/config.js';
+import { readJSON, writeJSON } from '../utils/storage.js';
 
 function randomItem(list) {
     return list[Math.floor(Math.random() * list.length)];
+}
+
+function sanitizeSeenIds(raw) {
+    if (!Array.isArray(raw)) {
+        return [];
+    }
+
+    return raw
+        .filter((item) => typeof item === 'string' && item.trim().length > 0)
+        .map((item) => item.trim());
+}
+
+function readSeenMap() {
+    const raw = readJSON(APP_CONFIG.storage.quizSeenKey, {});
+    const seenChoice = sanitizeSeenIds(raw?.choice);
+    const seenWord = sanitizeSeenIds(raw?.word);
+
+    return {
+        choice: seenChoice,
+        word: seenWord
+    };
+}
+
+function writeSeenMap(seenMap) {
+    writeJSON(APP_CONFIG.storage.quizSeenKey, {
+        choice: sanitizeSeenIds(seenMap?.choice),
+        word: sanitizeSeenIds(seenMap?.word)
+    });
+}
+
+function getKindKey(quizKind) {
+    if (quizKind === QUIZ_KINDS.WORD) {
+        return 'word';
+    }
+
+    return 'choice';
+}
+
+function pickQuestion(pool, quizKind) {
+    if (!Array.isArray(pool) || pool.length === 0) {
+        return null;
+    }
+
+    if (APP_CONFIG.quiz.uniquePerDevice !== true) {
+        return randomItem(pool);
+    }
+
+    const kindKey = getKindKey(quizKind);
+    const seenMap = readSeenMap();
+    const seenSet = new Set(seenMap[kindKey] ?? []);
+    const unseenPool = pool.filter((question) => !seenSet.has(question.id));
+
+    if (unseenPool.length === 0) {
+        return null;
+    }
+
+    const selected = randomItem(unseenPool);
+    seenSet.add(selected.id);
+    seenMap[kindKey] = Array.from(seenSet);
+    writeSeenMap(seenMap);
+    return selected;
 }
 
 function normalizeText(raw) {
@@ -184,11 +247,11 @@ export function createQuizEngine() {
 
     function start(quizKind = QUIZ_KINDS.CHOICE) {
         if (quizKind === QUIZ_KINDS.WORD) {
-            currentQuestion = buildWordQuestion(randomItem(wordPool));
+            currentQuestion = buildWordQuestion(pickQuestion(wordPool, QUIZ_KINDS.WORD));
             return currentQuestion;
         }
 
-        currentQuestion = randomItem(choicePool);
+        currentQuestion = pickQuestion(choicePool, QUIZ_KINDS.CHOICE);
         return currentQuestion;
     }
 
@@ -226,10 +289,15 @@ export function createQuizEngine() {
         }
 
         const selected = currentQuestion.answers[idx];
+        const correctAnswerIndexes = currentQuestion.answers
+            .map((answer, answerIndex) => (answer.correct ? answerIndex : -1))
+            .filter((answerIndex) => answerIndex >= 0);
 
         return {
             correct: selected.correct,
             answerText: selected.text,
+            selectedAnswerIndex: idx,
+            correctAnswerIndexes,
             questionId: currentQuestion.id,
             questionType: currentQuestion.type,
             quizKind: currentQuestion.quizKind

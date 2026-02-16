@@ -17,9 +17,39 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.8.1`
+**Current:** `0.8.3`
 
 ## 4. Lich su thay doi
+
+## [0.8.3] - 2026-02-16
+
+### Added
+- Khi user da bi lock, man hinh lock van hien nut:
+  - `🧠 Chơi quiz cho vui (không tính lượt)`.
+- Them luong `locked_fun` trong `main.js` de choi quiz giai tri ma khong anh huong:
+  - lock state
+  - quiz attempts cua game
+  - ket qua li xi da khoa.
+
+### Changed
+- `quiz modal` ho tro mode mo category khong hien counter attempts khi quiz chi de giai tri.
+
+## [0.8.2] - 2026-02-16
+
+### Added
+- Them co che khong lap lai cau quiz tren cung 1 thiet bi (localStorage):
+  - Mac dinh bat qua `QUIZ_UNIQUE_PER_DEVICE`.
+  - Luu danh sach cau da hien qua `QUIZ_SEEN_STORAGE_KEY`.
+
+### Changed
+- Quiz trắc nghiệm co highlight ket qua ngay sau khi tra loi:
+  - Dap an dung: mau xanh.
+  - Dap an chon sai: mau do.
+  - Cac dap an khac lam mo nhe de de nhin.
+- Them motion nhe cho highlight dap an de UI mem mai hon.
+
+### Fixed
+- Neu het cau hoi moi tren thiet bi, hệ thống hien thong bao ro rang thay vi dung im.
 
 ## [0.8.1] - 2026-02-16
 

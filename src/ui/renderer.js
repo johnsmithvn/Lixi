@@ -326,7 +326,7 @@ export function createRenderer() {
         refs.envelopeGrid.appendChild(card);
     }
 
-    function showLockedScreen(lockState) {
+    function showLockedScreen(lockState, handlers = {}) {
         const mode = lockState?.mode ?? GAME_MODES.LOCKED;
         const fate = lockState?.fate ?? null;
 
@@ -384,6 +384,15 @@ export function createRenderer() {
             remaining.className = 'locked-remaining';
             remaining.textContent = remainingText;
             card.appendChild(remaining);
+        }
+
+        if (typeof handlers.onPlayQuiz === 'function') {
+            const playQuizBtn = document.createElement('button');
+            playQuizBtn.type = 'button';
+            playQuizBtn.className = 'extra-chance-btn';
+            playQuizBtn.textContent = '🧠 Chơi quiz cho vui (không tính lượt)';
+            playQuizBtn.addEventListener('click', handlers.onPlayQuiz);
+            card.appendChild(playQuizBtn);
         }
 
         refs.envelopeGrid.appendChild(card);

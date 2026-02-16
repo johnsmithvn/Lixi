@@ -1,4 +1,8 @@
-﻿function buildStepLabel(baseText, quizStatus) {
+function buildStepLabel(baseText, quizStatus) {
+    if (!quizStatus || typeof quizStatus !== 'object') {
+        return baseText;
+    }
+
     const maxAttempts = quizStatus?.maxAttempts ?? 3;
     const attemptsUsed = quizStatus?.attemptsUsed ?? 0;
     const nextAttempt = Math.min(maxAttempts, attemptsUsed + 1);
@@ -97,12 +101,57 @@ export function createQuizModalController() {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'quiz-answer-btn';
+            button.dataset.answerIndex = String(index);
             button.textContent = answer.text;
             button.addEventListener('click', () => {
                 handlers?.onAnswer({ answerIndex: index });
             });
 
             refs.answers.appendChild(button);
+        });
+    }
+
+    function resetAnswerResultStyles() {
+        refs.answers.querySelectorAll('.quiz-answer-btn').forEach((button) => {
+            button.classList.remove(
+                'quiz-answer-btn--correct',
+                'quiz-answer-btn--wrong',
+                'quiz-answer-btn--muted'
+            );
+        });
+    }
+
+    function revealChoiceResult(feedback) {
+        if (feedback?.quizKind !== 'choice') {
+            return;
+        }
+
+        const selectedIndex = Number(feedback.selectedAnswerIndex);
+        const correctIndexes = Array.isArray(feedback.correctAnswerIndexes)
+            ? feedback.correctAnswerIndexes
+                .map((value) => Number(value))
+                .filter((value) => Number.isInteger(value) && value >= 0)
+            : [];
+
+        if (!Number.isInteger(selectedIndex) || correctIndexes.length === 0) {
+            return;
+        }
+
+        const correctSet = new Set(correctIndexes);
+        const answerButtons = Array.from(refs.answers.querySelectorAll('.quiz-answer-btn'));
+
+        answerButtons.forEach((button, answerIndex) => {
+            if (correctSet.has(answerIndex)) {
+                button.classList.add('quiz-answer-btn--correct');
+                return;
+            }
+
+            if (answerIndex === selectedIndex && feedback.correct === false) {
+                button.classList.add('quiz-answer-btn--wrong');
+                return;
+            }
+
+            button.classList.add('quiz-answer-btn--muted');
         });
     }
 
@@ -354,10 +403,12 @@ export function createQuizModalController() {
             return;
         }
 
+        resetAnswerResultStyles();
         refs.feedbackTitle.textContent = feedback.title;
         refs.feedbackText.textContent = feedback.message;
         refs.feedback.classList.remove('hidden');
         refs.feedback.classList.add(feedback.correct ? 'quiz-feedback--ok' : 'quiz-feedback--miss');
+        revealChoiceResult(feedback);
 
         if (typeof feedback.continueLabel === 'string' && feedback.continueLabel.trim()) {
             refs.continueBtn.textContent = feedback.continueLabel;

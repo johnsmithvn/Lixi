@@ -28,6 +28,7 @@ Web mini-game li xi theo huong mobile-first, module architecture, va mode lock l
   - Neu lan dau mo ra `troll`/`joke`, user duoc quiz 1 cau.
   - Dung: them 1 luot mo bao.
   - Sai: khoa luot.
+- Khi da bi lock van co the `Choi quiz cho vui` (khong mo khoa, khong tinh luot).
 - Quiz chi ho tro `text` va `image` (khong ho tro video).
 
 ## 3. UX quiz (theo y tuong moi)
@@ -89,6 +90,8 @@ window.APP_CONFIG = {
   ALLOW_QUERY_OVERRIDE: true,
   ENABLE_EXTRA_CHANCE_QUIZ: true,
   QUIZ_MAX_ATTEMPTS: 3,
+  QUIZ_UNIQUE_PER_DEVICE: true,
+  QUIZ_SEEN_STORAGE_KEY: 'lixi_quiz_seen_v1',
 
   OPEN_GATE_ENABLED: false,
   OPEN_GATE_AT: '2026-02-20T20:00:00+07:00',
@@ -114,6 +117,8 @@ Y nghia nhanh:
 - `ENABLE_LOCK: false` -> tuong duong free mode.
 - `ENABLE_EXTRA_CHANCE_QUIZ: false` -> tat mini-quiz extra chance.
 - `QUIZ_MAX_ATTEMPTS` -> so lan tra loi quiz toi da.
+- `QUIZ_UNIQUE_PER_DEVICE: true` -> moi cau quiz chi hien thi 1 lan tren 1 thiet bi.
+- `QUIZ_SEEN_STORAGE_KEY` -> key localStorage de luu lich su cau da hien.
 - `OPEN_GATE_ENABLED: true` -> bat che do mo cua theo gio.
 - `OPEN_GATE_AT` -> thoi diem web cho phep vao game.
 - `OPEN_GATE_ALLOW_QUIZ: true` -> cho choi quiz khi dang cho mo cua.

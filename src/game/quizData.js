@@ -50,7 +50,7 @@ export const CHOICE_QUIZ_SET = [
       { text: "Con chúc ông bà nhiều sức khỏe ạ", correct: true },
       { text: "Con xin pass năm nay", correct: false },
       { text: "Con chào cho có lệ", correct: false },
-    { text: "Con tới nhận lì xì thôi ạ", correct: false },
+      { text: "Con tới nhận lì xì thôi ạ", correct: false },
     ],
   },
   {
@@ -123,30 +123,6 @@ export const CHOICE_QUIZ_SET = [
     ],
   },
   {
-    id: "q5",
-    type: "text",
-    question:
-      "Con gì khi sinh ra đã là con của bạn, nhưng không phải anh chị em của bạn?",
-    media: null,
-    answers: [
-      { text: "Con của bạn", correct: true },
-      { text: "Cháu bạn", correct: false },
-      { text: "Em bạn", correct: false },
-    ],
-  },
-  {
-    id: "q6",
-    type: "text",
-    question:
-      "Làm thế nào để hai người có thể ngồi trên một ghế sofa nhỏ mà không ai chạm vào ai?",
-    media: null,
-    answers: [
-      { text: "Cả hai đều đang đứng", correct: true },
-      { text: "Ngồi quay lưng lại", correct: false },
-      { text: "Ngồi nghiêng người", correct: false },
-    ],
-  },
-  {
     id: "q7",
     type: "text",
     question: "Cái gì mà bạn phải cởi ra trước khi sử dụng?",
@@ -154,7 +130,6 @@ export const CHOICE_QUIZ_SET = [
     answers: [
       { text: "Vỏ chuối", correct: true },
       { text: "Vỏ kẹo", correct: true },
-      { text: "Bao bì sản phẩm", correct: true },
       { text: "Áo khoác", correct: false },
     ],
   },
@@ -176,7 +151,7 @@ export const CHOICE_QUIZ_SET = [
     question: "Cái gì ai cũng có nhưng chỉ dùng khi cần?",
     media: null,
     answers: [
-      { text: "Óc", correct: true },
+      { text: "Não", correct: true },
       { text: "Điện thoại", correct: false },
       { text: "Tiền", correct: false },
     ],
@@ -201,6 +176,50 @@ export const CHOICE_QUIZ_SET = [
       { text: "Phở cuốn", correct: false },
       { text: "Canh măng", correct: true },
       { text: "Hamburger", correct: false },
+    ],
+  },
+  {
+    id: "q17",
+    type: "text",
+    question: "Deadline đáng sợ nhất khi nào?",
+    media: null,
+    answers: [
+      { text: "Khi còn 1 tuần", correct: false },
+      { text: "Khi còn 1 ngày", correct: false },
+      { text: "Khi mình vẫn chưa thấy sợ", correct: true },
+    ],
+  },
+  {
+    id: "q19",
+    type: "text",
+    question: "Tiền của mình thường đi đâu?",
+    media: null,
+    answers: [
+      { text: "Đầu tư sinh lời", correct: false },
+      { text: "Tự chuyển sang tài khoản người khác", correct: true },
+      { text: "Nằm yên trong ví", correct: false },
+    ],
+  },
+  {
+    id: "q21",
+    type: "text",
+    question: "Mỗi sáng mình thức dậy để làm gì?",
+    media: null,
+    answers: [
+      { text: "Đón chào ngày mới đầy năng lượng", correct: false },
+      { text: "Ngủ thêm 5 phút nữa", correct: true },
+      { text: "Tập thể dục ngay lập tức", correct: false },
+    ],
+  },
+  {
+    id: "q22",
+    type: "text",
+    question: "Khi crush không rep tin nhắn nghĩa là gì?",
+    media: null,
+    answers: [
+      { text: "Họ đang bận thật", correct: false },
+      { text: "Mình là lốp", correct: true },
+      { text: "Mạng họ yếu", correct: false },
     ],
   },
 ];
