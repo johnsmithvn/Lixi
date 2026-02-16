@@ -11,6 +11,10 @@ function randomItem(list) {
     return list[Math.floor(Math.random() * list.length)];
 }
 
+function sortChars(raw) {
+    return String(raw ?? '').split('').sort().join('');
+}
+
 function sanitizeSeenIds(raw) {
     if (!Array.isArray(raw)) {
         return [];
@@ -119,6 +123,34 @@ function getDisplayWordTokens(raw) {
     return normalized.split(' ').filter(Boolean);
 }
 
+function resolvePresetScrambled(rawPreset, answerNormalized) {
+    if (typeof rawPreset !== 'string') {
+        return null;
+    }
+
+    const displayTokens = getDisplayWordTokens(rawPreset);
+    if (displayTokens.length === 0) {
+        return null;
+    }
+
+    const mergedDisplay = displayTokens.join('');
+    const normalizedPreset = normalizeText(mergedDisplay);
+
+    if (!normalizedPreset || normalizedPreset === answerNormalized) {
+        return null;
+    }
+
+    if (normalizedPreset.length !== answerNormalized.length) {
+        return null;
+    }
+
+    if (sortChars(normalizedPreset) !== sortChars(answerNormalized)) {
+        return null;
+    }
+
+    return mergedDisplay;
+}
+
 function shuffleLetters(rawWord) {
     const letters = rawWord.split('');
 
@@ -192,6 +224,10 @@ function sanitizeWordPuzzle(question) {
     const safeDisplayTokens = displayWordTokens.length > 0 ? displayWordTokens : wordTokens;
     const displayAnswer = safeDisplayTokens.join('');
     const wordLengths = safeDisplayTokens.map((token) => token.length).filter((length) => length > 0);
+    const presetScrambled = resolvePresetScrambled(
+        question.presetScrambled ?? question.scrambled ?? null,
+        answer
+    );
 
     return {
         id: question.id,
@@ -201,6 +237,7 @@ function sanitizeWordPuzzle(question) {
         hint: question.hint,
         answer,
         displayAnswer,
+        presetScrambled,
         wordLengths,
         wordCount: wordLengths.length,
         placeholder: question.placeholder ?? 'Nhập đáp án không dấu...'
@@ -212,12 +249,16 @@ function buildWordQuestion(baseQuestion) {
         return null;
     }
 
-    let scrambled = baseQuestion.displayAnswer;
-    let attempt = 0;
+    let scrambled = baseQuestion.presetScrambled;
 
-    while (normalizeText(scrambled) === baseQuestion.answer && attempt < 8) {
-        scrambled = shuffleLetters(baseQuestion.displayAnswer);
-        attempt += 1;
+    if (!scrambled) {
+        scrambled = baseQuestion.displayAnswer;
+        let attempt = 0;
+
+        while (normalizeText(scrambled) === baseQuestion.answer && attempt < 8) {
+            scrambled = shuffleLetters(baseQuestion.displayAnswer);
+            attempt += 1;
+        }
     }
 
     return {

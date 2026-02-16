@@ -17,9 +17,21 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.8.3`
+**Current:** `0.8.4`
 
 ## 4. Lich su thay doi
+
+## [0.8.4] - 2026-02-16
+
+### Added
+- Word puzzle ho tro field `presetScrambled` (hoac alias `scrambled`) de truyen chu da xao san.
+
+### Changed
+- Neu `presetScrambled` hop le thi su dung truc tiep, khong random nua.
+- Neu khong co `presetScrambled` hoac field sai du lieu thi fallback ve random nhu cu.
+
+### Fixed
+- Bo sung validate de dam bao `presetScrambled` dung bo chu cua dap an, tranh puzzle loi.
 
 ## [0.8.3] - 2026-02-16
 

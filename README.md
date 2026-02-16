@@ -182,11 +182,25 @@ Mau `image`:
 }
 ```
 
+Mau `word` (co the truyen chu da xao san):
+
+```js
+{
+  id: 'w_custom_1',
+  question: 'Giai ma tu khoa Tet sau',
+  hint: 'Mon banh truyen thong goi la dong',
+  answer: 'BANH CHUNG',
+  // Neu co field nay thi se dung luon, khong random nua
+  presetScrambled: 'CHUN GHBAN'
+}
+```
+
 Luu y:
 
 - Khong dung `type: 'video'`.
 - Moi cau can it nhat 2 dap an.
 - Moi cau nen co dung 1 dap an `correct: true`.
+- Word puzzle co ho tro alias `scrambled`, nhung nen dung `presetScrambled` de ro nghia.
 
 ## 9. Chay local
 

@@ -236,6 +236,7 @@ export const WORD_PUZZLE_SET = [
     question: "Giải mã từ khóa Tết sau",
     hint: "Món bánh truyền thống gói lá dong",
     answer: "BÁNH CHƯNG",
+    presetScrambled: "CHNƯ GHBÁN",
   },
   {
     id: "w3",
@@ -255,4 +256,51 @@ export const WORD_PUZZLE_SET = [
     hint: "Loại trái cây hay bày mâm ngũ quả",
     answer: "BƯỞI",
   },
+  {
+    id: 'w_custom_1',
+    question: 'Sắp xếp chữ thành từ có nghĩa',
+    hint: 'Cảm giác bất an, lo âu',
+    answer: 'LO LẮNG',
+    presetScrambled: 'GẮNLOL'
+  },
+  {
+    id: 'w_custom_4',
+    question: 'Sắp xếp chữ thành từ có nghĩa',
+    hint: 'Liên quan đến phim ảnh ',
+    answer: 'ĐIỆN ẢNH',
+  },
+  {
+    id: 'w_custom_7',
+    question: 'Sắp xếp chữ thành từ có nghĩa',
+    hint: 'Hành động tăng tốc (nghe giống Bốc...)',
+    answer: 'BỨT TỐC',
+    presetScrambled: 'BỐC TỨT'
+  },
+  {
+    id: 'w_custom_13',
+    question: 'Sắp xếp chữ thành từ có nghĩa',
+    hint: 'Tên một loài cá (từng có trong truyện cổ tích t&c)',
+    answer: 'CÁ BỐNG',
+    presetScrambled: 'BÁC NGỐ'
+  },
+  {
+    id: 'w_custom_16',
+    question: 'Sắp xếp tên Idol',
+    hint: 'Rapper trong Anh Trai Say Hi',
+    answer: 'HIEUTHUHAI',
+  },
+  {
+    id: 'w_custom_19',
+    question: 'Sắp xếp chữ thành từ có nghĩa',
+    hint: 'Giấy tờ tùy thân',
+    answer: 'CĂN CƯỚC',
+    presetScrambled: 'ĂNCỨCỚc'
+  },
+  {
+    id: 'w_custom_24',
+    question: 'Sắp xếp chữ thành từ có nghĩa',
+    hint: 'Tên loài cá ',
+    answer: 'CÁ MÈ',
+  },
+
 ];
