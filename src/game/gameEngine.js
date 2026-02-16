@@ -17,11 +17,11 @@ const QUIZ_PASS_MESSAGE = {
 };
 
 const QUIZ_FAIL_MESSAGE = {
-    title: '😆 Hơi thiếu một chút!',
-    message: 'Vận may dừng lại ở đây nhé~'
+    title: '😆Không sao, Thần Tài vẫn đang xem xét.!',
+    message: 'May mắn tạm nghỉ giữa hiệp 😌 IB chủ thớt để đá hiệp 2~'
 };
 
-const QUIZ_RETRY_TITLE = '😆 Hơi thiếu một chút!';
+const QUIZ_RETRY_TITLE = '😆 Sai rồi, nhưng dễ thương nên tha!';
 
 export function createGameEngine(eventBus = defaultEventBus) {
     const gameMode = createGameModeManager();
@@ -51,16 +51,16 @@ export function createGameEngine(eventBus = defaultEventBus) {
         return APP_CONFIG.quiz.enabledInLockedMode === true;
     }
 
-    function canOfferExtraChance() {
-        const maxAttempts = APP_CONFIG.quiz.maxAttempts;
+    function hasRemainingQuizAttempts() {
+        return state.quizAttemptsUsed < APP_CONFIG.quiz.maxAttempts;
+    }
 
+    function canOfferExtraChance() {
         return isLockedMode()
             && isExtraQuizEnabled()
             && state.played
-            && !state.hasMoney
-            && !state.usedExtraChance
             && state.extraChanceAvailable
-            && state.quizAttemptsUsed < maxAttempts;
+            && hasRemainingQuizAttempts();
     }
 
     function setBusy(isBusy) {
@@ -130,7 +130,9 @@ export function createGameEngine(eventBus = defaultEventBus) {
 
     function openEnvelope(index) {
         const activeFate = gameMode.getActiveFate();
-        if (activeFate) {
+        const isOverwritingLockedFate = Boolean(activeFate && state.extraChanceUnlocked);
+
+        if (activeFate && !isOverwritingLockedFate) {
             emitLockedSession(activeFate);
             return null;
         }
@@ -142,6 +144,10 @@ export function createGameEngine(eventBus = defaultEventBus) {
         const envelope = state.envelopes[index];
         if (!envelope || envelope.opened || state.isBusy) {
             return null;
+        }
+
+        if (isOverwritingLockedFate) {
+            gameMode.clearLock();
         }
 
         const firstOpen = !state.played;
@@ -174,12 +180,24 @@ export function createGameEngine(eventBus = defaultEventBus) {
             shouldLock = true;
             lockReason = 'strict_mode_lock';
         } else if (isLockedMode()) {
+            const canContinueQuiz = isExtraQuizEnabled() && hasRemainingQuizAttempts();
+
             if (state.hasMoney) {
                 shouldLock = true;
-                lockReason = usingExtraTurn ? 'second_win' : 'first_win';
-                state.extraChanceAvailable = false;
-            } else if (firstOpen && !state.usedExtraChance && isExtraQuizEnabled()) {
-                shouldLock = false;
+                if (canContinueQuiz) {
+                    lockReason = usingExtraTurn ? 'reroll_win' : 'first_win';
+                    state.extraChanceAvailable = true;
+                    eventBus.emit('session:extra-chance-offered', {
+                        mode: gameMode.mode,
+                        result: state.currentResult
+                    });
+                } else {
+                    lockReason = usingExtraTurn ? 'second_win' : 'first_win';
+                    state.extraChanceAvailable = false;
+                }
+            } else if (canContinueQuiz) {
+                shouldLock = !firstOpen;
+                lockReason = usingExtraTurn ? 'reroll_continue' : 'first_miss';
                 state.extraChanceAvailable = true;
                 eventBus.emit('session:extra-chance-offered', {
                     mode: gameMode.mode,

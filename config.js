@@ -27,8 +27,8 @@
 
     // ===== GAME BALANCE =====
     TOTAL_ENVELOPES: 10,
-    TROLL_CHANCE: 0.8, // 20%
-    MONEY_CHANCE: 0.1, // 40%
+    TROLL_CHANCE: 0.2, // 20%
+    MONEY_CHANCE: 0.4, // 40%
 
     // ===== LOCK DURATION (DANG DE DOC) =====
     LOCK_DURATION_DAYS: 365,

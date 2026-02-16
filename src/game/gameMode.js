@@ -72,6 +72,8 @@ export function createGameModeManager() {
                 type: result.type,
                 title: result.title,
                 text: result.text,
+                reveal: result.reveal,
+                claimNote: result.claimNote,
                 blessing: result.blessing
             },
             meta

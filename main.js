@@ -259,6 +259,12 @@ function handleQuizCancel() {
 function handlePlayAgain() {
     modal.hide();
 
+    const currentResult = game.getState().currentResult;
+    if (game.canOfferExtraChance() && currentResult?.type === 'money') {
+        openQuizKindPicker();
+        return;
+    }
+
     if (maybeShowExtraChancePrompt()) {
         return;
     }

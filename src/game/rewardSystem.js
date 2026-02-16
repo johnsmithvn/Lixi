@@ -29,7 +29,7 @@ const HOVER_QUOTES = [
     'Bốc tui xong nhớ khoe với bạn bè nha 📸'
 ];
 
-const MONEY_REWARDS = ['99999đ', '50.000đ', '100.000đ', '200.000đ', '500.000đ'];
+const MONEY_REWARDS = ['99.999đ', '50.000đ', '100.000đ', '80.000đ'];
 
 const JOKE_REWARDS = [
     'Bạn vừa nhận được năng lượng ngủ nướng +100 😴',

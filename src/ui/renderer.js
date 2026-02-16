@@ -99,7 +99,7 @@ function extractMoneyAmount(title) {
 
 function getLockStopMessage(reason) {
     if (reason === 'quiz_failed') {
-        return 'May mắn tạm nghỉ giữa hiệp 😌. IB chủ thớt để mở khóa ';
+        return 'Vận may đang ngủ trưa… nhắn chủ thớt đánh thức giúp!';
     }
 
     if (reason === 'second_miss') {
@@ -272,14 +272,21 @@ export function createRenderer() {
         const quizStatus = payload?.quiz ?? null;
         const maxAttempts = quizStatus?.maxAttempts ?? APP_CONFIG.quiz.maxAttempts;
         const remainingAttempts = quizStatus?.remainingAttempts ?? maxAttempts;
+        const isMoneyReroll = latestResult?.type === 'money';
 
         showScreen('game-screen');
         hideSpeech(true);
 
-        refs.gameTitle.textContent = '🧧 Hôm nay vận may chưa mỉm cười...';
-        refs.gameSubtitle.textContent = 'Nhưng bạn có thể thử thêm 1 cơ hội nữa!';
+        refs.gameTitle.textContent = isMoneyReroll
+            ? '🧧 Bạn đã trúng rồi, muốn bốc lại không?'
+            : '🧧 Hôm nay vận may chưa mỉm cười...';
+        refs.gameSubtitle.textContent = isMoneyReroll
+            ? 'Vượt quiz để mở thêm 1 bao và ghi đè kết quả cũ.'
+            : 'Nhưng bạn có thể thử thêm 1 cơ hội nữa!';
 
-        refs.openedCounter.textContent = '🎯 Bonus: Vượt quiz là được mở thêm 1 bao';
+        refs.openedCounter.textContent = isMoneyReroll
+            ? '🎯 Bonus: Qua quiz để bốc lại kết quả'
+            : '🎯 Bonus: Vượt quiz là được mở thêm 1 bao';
         refs.streakCounter.textContent = `Mini Quiz: còn ${remainingAttempts}/${maxAttempts} lượt trả lời`;
         refs.streakCounter.classList.remove('hot');
 
@@ -291,11 +298,15 @@ export function createRenderer() {
 
         const title = document.createElement('h3');
         title.className = 'locked-title';
-        title.textContent = '🎯 Thử vận may lần nữa';
+        title.textContent = isMoneyReroll
+            ? '🎯 Quiz xác nhận bốc lại'
+            : '🎯 Thử vận may lần nữa';
 
         const message = document.createElement('p');
         message.className = 'locked-text';
-        message.textContent = `Bạn có tối đa ${maxAttempts} lần trả lời. Trúng 1 câu là được mở thêm 1 bao.`;
+        message.textContent = isMoneyReroll
+            ? `Bạn có tối đa ${maxAttempts} lần trả lời. Đúng 1 câu là được bốc lại và ghi đè kết quả cũ.`
+            : `Bạn có tối đa ${maxAttempts} lần trả lời. Trúng 1 câu là được mở thêm 1 bao.`;
 
         card.appendChild(title);
         card.appendChild(message);

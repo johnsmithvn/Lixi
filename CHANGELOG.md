@@ -17,9 +17,37 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.6.1`
+**Current:** `0.6.3`
 
 ## 4. Lich su thay doi
+
+## [0.6.3] - 2026-02-16
+
+### Changed
+- Dieu chinh flow `LOCKED + Quiz`:
+  - Sau khi user quiz dung va bốc lai, neu van con luot quiz thi tiep tuc duoc quiz them.
+  - Khong khoa cung ngay sau lan bốc lai neu van con quota quiz.
+- Cho phep vong lap:
+  - `Quiz dung -> mo 1 bao`
+  - `Neu chua het quiz attempts -> duoc quiz tiep`.
+
+### Fixed
+- Sua dieu kien `canOfferExtraChance()` de khong bi chan boi flag `usedExtraChance` khi user van con luot quiz.
+
+## [0.6.2] - 2026-02-16
+
+### Added
+- Ho tro flow `trung tien lan dau` + `Bốc lại nào`:
+  - Bam `Bốc lại nào` se mo chon the loai quiz.
+  - Qua quiz se duoc mo them 1 bao de bốc lại.
+
+### Changed
+- LOCKED mode cho phep `extra chance` ca khi ket qua lan dau la `money`.
+- Khi da lock ket qua lan dau va user mo thanh cong luot bốc lai, ket qua moi se ghi de fate cu.
+- Cap nhat man hinh extra chance de co thong diep rieng cho case `trung roi nhung muon bốc lai`.
+
+### Fixed
+- Luu them truong `reveal` / `claimNote` vao fate de lock screen hien dung thong tin ket qua.
 
 ## [0.6.1] - 2026-02-16
 
