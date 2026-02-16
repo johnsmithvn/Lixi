@@ -433,6 +433,12 @@ h1 {
     color: #915704;
 }
 
+.latest-result-badge--special {
+    background: linear-gradient(135deg, rgba(255, 225, 130, 0.35), rgba(255, 189, 94, 0.4));
+    color: #8b4d05;
+    box-shadow: 0 4px 12px rgba(238, 163, 50, 0.24);
+}
+
 .latest-result-badge--joke {
     background: rgba(255, 143, 122, 0.26);
     color: #a23d2f;
@@ -731,6 +737,7 @@ h1 {
     font-size: 1.04rem;
     font-weight: 600;
     line-height: 1.45;
+    white-space: pre-line;
 }
 
 .result-sub.strike {

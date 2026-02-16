@@ -17,9 +17,37 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.8.4`
+**Current:** `0.8.6`
 
 ## 4. Lich su thay doi
+
+## [0.8.6] - 2026-02-16
+
+### Changed
+- Gioi han `giải đặc biệt` chi xuat hien toi da 1 lan trong moi round.
+- Neu co them envelope roi vao vung xac suat special sau khi da co 1 special, ket qua se fallback ve money/joke theo logic hien tai.
+
+## [0.8.5] - 2026-02-16
+
+### Added
+- Them ket qua `special` (giai dac biet lon nhat).
+- Them config:
+  - `SPECIAL_CHANCE`
+  - `SPECIAL_CONFETTI_COUNT`
+  - `SOUND_SPECIAL_SRC`
+- Ho tro map source audio tu `config.js` cho ca 4 kenh:
+  - `SOUND_CLICK_SRC`
+  - `SOUND_WIN_SRC`
+  - `SOUND_TROLL_SRC`
+  - `SOUND_SPECIAL_SRC`
+
+### Changed
+- Khi trung `special`:
+  - confetti bung nhieu dot lien tiep
+  - rung manh hon
+  - an nut `Bốc lại nào` trong modal
+  - khoa luot ngay, khong mo extra chance/quiz bốc lại.
+- Lock screen hien badge rieng cho `special` va nhieu dong loi chuc y nghia.
 
 ## [0.8.4] - 2026-02-16
 

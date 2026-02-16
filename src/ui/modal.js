@@ -52,15 +52,22 @@ export function createModalController() {
         refs.resultIcon.textContent = result.icon;
         refs.resultMain.textContent = result.title;
         refs.resultSub.textContent = result.text;
+
+        if (result.type === 'special' && Array.isArray(result.blessingList) && result.blessingList.length > 0) {
+            const blessingLines = result.blessingList.map((item) => `• ${item}`);
+            refs.resultSub.textContent = [result.text, ...blessingLines].join('\n');
+        }
         refs.resultSub.classList.remove('strike');
         refs.resultClaimNote.classList.add('hidden');
         refs.resultClaimNote.textContent = '';
 
-        refs.resultStreak.textContent = result.type === 'money'
+        refs.resultStreak.textContent = result.type === 'special'
+            ? '👑 Giải đặc biệt đã kích hoạt. Năm nay quá rực rỡ!'
+            : result.type === 'money'
             ? `🔥 Chuỗi may mắn: x${result.streak}`
             : 'Chuỗi may mắn hiện tại: x0';
 
-        if (result.type === 'money') {
+        if (result.type === 'money' || result.type === 'special') {
             refs.resultClaimNote.textContent = result.claimNote ?? '📸 Chụp ảnh màn hình gửi chủ thớt để lĩnh xèng nha!';
             refs.resultClaimNote.classList.remove('hidden');
         }
@@ -68,6 +75,7 @@ export function createModalController() {
         refs.trollReveal.classList.add('hidden');
         refs.trollReveal.textContent = '';
         refs.extraChanceBtn.classList.toggle('hidden', !options.showExtraChanceButton);
+        refs.playAgainBtn.classList.toggle('hidden', options.showPlayAgainButton === false);
 
         if (result.type === 'troll') {
             trollRevealTimer = window.setTimeout(() => {
@@ -89,6 +97,7 @@ export function createModalController() {
         document.body.classList.remove('modal-open');
         refs.extraChanceBtn.classList.add('hidden');
         refs.resultClaimNote.classList.add('hidden');
+        refs.playAgainBtn.classList.remove('hidden');
     }
 
     return {

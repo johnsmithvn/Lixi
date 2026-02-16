@@ -162,7 +162,8 @@ export function createGameEngine(eventBus = defaultEventBus) {
         const outcome = resolveEnvelopeResult(envelope, state.streak);
         state.streak = outcome.nextStreak;
         state.currentResult = outcome.result;
-        state.hasMoney = state.currentResult.type === 'money';
+        const isSpecialWin = state.currentResult.type === 'special';
+        state.hasMoney = state.currentResult.type === 'money' || isSpecialWin;
 
         if (state.streak > state.maxStreak) {
             state.maxStreak = state.streak;
@@ -184,7 +185,10 @@ export function createGameEngine(eventBus = defaultEventBus) {
 
             if (state.hasMoney) {
                 shouldLock = true;
-                if (canContinueQuiz) {
+                if (isSpecialWin) {
+                    lockReason = usingExtraTurn ? 'special_reroll_win' : 'special_win';
+                    state.extraChanceAvailable = false;
+                } else if (canContinueQuiz) {
                     lockReason = usingExtraTurn ? 'reroll_win' : 'first_win';
                     state.extraChanceAvailable = true;
                     eventBus.emit('session:extra-chance-offered', {

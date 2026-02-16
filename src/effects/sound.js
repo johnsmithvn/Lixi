@@ -1,4 +1,6 @@
-﻿let audioContext;
+﻿import { APP_CONFIG } from '../core/config.js';
+
+let audioContext;
 
 function getAudioContext() {
     if (!audioContext) {
@@ -83,6 +85,16 @@ function playFallback(effectType) {
         return;
     }
 
+    if (effectType === 'special') {
+        playTonePattern([
+            { frequency: 700, duration: 0.08, type: 'triangle', gain: 0.14 },
+            { frequency: 980, duration: 0.11, type: 'sine', gain: 0.13 },
+            { frequency: 1320, duration: 0.13, type: 'sine', gain: 0.13 },
+            { frequency: 1760, duration: 0.15, type: 'triangle', gain: 0.12 }
+        ]);
+        return;
+    }
+
     if (effectType === 'win') {
         playTonePattern([
             { frequency: 660, duration: 0.09, type: 'sine', gain: 0.12 },
@@ -108,7 +120,25 @@ async function playEffect(audioId, fallbackType) {
 }
 
 export function createSoundController() {
+    function setAudioSource(id, src) {
+        const element = document.getElementById(id);
+        if (!(element instanceof HTMLAudioElement) || typeof src !== 'string' || src.trim().length === 0) {
+            return;
+        }
+
+        element.src = src.trim();
+    }
+
+    function applyConfiguredSources() {
+        setAudioSource('click-sfx', APP_CONFIG.audio.clickSrc);
+        setAudioSource('win-sfx', APP_CONFIG.audio.winSrc);
+        setAudioSource('troll-sfx', APP_CONFIG.audio.trollSrc);
+        setAudioSource('special-sfx', APP_CONFIG.audio.specialSrc);
+    }
+
     function init() {
+        applyConfiguredSources();
+
         const unlockHandler = () => {
             void unlockAudioContext();
         };
@@ -135,11 +165,16 @@ export function createSoundController() {
         void playEffect('troll-sfx', 'troll');
     }
 
+    function playSpecial() {
+        void playEffect('special-sfx', 'special');
+    }
+
     return {
         init,
         preload,
         playClick,
         playWin,
-        playTroll
+        playTroll,
+        playSpecial
     };
 }

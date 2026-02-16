@@ -167,14 +167,17 @@ const openFlowMode = normalizeOpenFlowMode(globalConfig.OPEN_FLOW_MODE)
     ?? (globalConfig.DRAMA_OPEN_FLOW === false ? 'QUICK' : 'DRAMA');
 
 const trollChance = asProbability(globalConfig.TROLL_CHANCE, 0.2);
+const configuredSpecialChance = asProbability(globalConfig.SPECIAL_CHANCE, 0.05);
+const specialChance = Math.min(1 - trollChance, configuredSpecialChance);
 const configuredMoneyChance = asProbability(globalConfig.MONEY_CHANCE, 0.4);
-const moneyChance = Math.min(1 - trollChance, configuredMoneyChance);
+const moneyChance = Math.min(1 - trollChance - specialChance, configuredMoneyChance);
 
 export const APP_CONFIG = {
     totalEnvelopes: asPositiveNumber(globalConfig.TOTAL_ENVELOPES, 10),
     speechDebounceMs: 350,
     probabilities: {
         trollChance,
+        specialChance,
         moneyChance
     },
     timings: {
@@ -187,10 +190,17 @@ export const APP_CONFIG = {
         confetti: {
             troll: 120,
             money: 160,
+            special: asPositiveNumber(globalConfig.SPECIAL_CONFETTI_COUNT, 420),
             moneyStreakBonus: 250,
             joke: 95,
             trollReveal: 65
         }
+    },
+    audio: {
+        clickSrc: asOptionalString(globalConfig.SOUND_CLICK_SRC),
+        winSrc: asOptionalString(globalConfig.SOUND_WIN_SRC),
+        trollSrc: asOptionalString(globalConfig.SOUND_TROLL_SRC),
+        specialSrc: asOptionalString(globalConfig.SOUND_SPECIAL_SRC)
     },
     storage: {
         bestStreakKey: 'lixi_best_streak_v1',

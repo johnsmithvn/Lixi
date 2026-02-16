@@ -48,12 +48,23 @@
     // Dinh dang de xuat: '2026-02-20T20:00:00+07:00'
     OPEN_GATE_AT: '2026-02-17T00:00:00+07:00',
     // Cho phep choi quiz trong luc cho mo cua.
-    OPEN_GATE_ALLOW_QUIZ: true,
+    OPEN_GATE_ALLOW_QUIZ: false,
 
     // ===== GAME BALANCE =====
     TOTAL_ENVELOPES: 10,
     TROLL_CHANCE: 0.2, // 20%
+    // Giai dac biet lon nhat (uu tien truoc money)
+    SPECIAL_CHANCE: 0.05, // 5%
     MONEY_CHANCE: 0.4, // 40%
+    SPECIAL_CONFETTI_COUNT: 420,
+
+    // ===== AUDIO SOURCES (OPTIONAL) =====
+    // Dat file trong assets/audio va dien duong dan nhu ben duoi.
+    // Neu bo trong/null, he thong se dung am fallback.
+    SOUND_CLICK_SRC: '/assets/audio/click.mp3',
+    SOUND_WIN_SRC: '/assets/audio/win.mp3',
+    SOUND_TROLL_SRC: '/assets/audio/troll.mp3',
+    SOUND_SPECIAL_SRC: '/assets/audio/special.mp3',
 
     // ===== LOCK DURATION (DANG DE DOC) =====
     LOCK_DURATION_DAYS: 365,

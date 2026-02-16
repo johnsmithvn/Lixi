@@ -347,12 +347,18 @@ async function handleEnvelopeOpenConfirmed(payload) {
         await playRevealAnimation(element);
 
         confetti.fire(result.confettiCount);
-        if (result.type === 'money') {
+        if (result.type === 'special') {
+            sounds.playSpecial();
+            vibrate(APP_CONFIG.effects.vibrationMs * 2);
+            window.setTimeout(() => confetti.fire(Math.round(result.confettiCount * 0.65)), 200);
+            window.setTimeout(() => confetti.fire(Math.round(result.confettiCount * 0.45)), 420);
+        } else if (result.type === 'money') {
             sounds.playWin();
         }
 
         modal.show(result, {
             showExtraChanceButton: game.canOfferExtraChance(),
+            showPlayAgainButton: result.type !== 'special',
             onTrollReveal: () => {
                 sounds.playTroll();
                 confetti.fire(APP_CONFIG.effects.confetti.trollReveal);

@@ -99,7 +99,14 @@ window.APP_CONFIG = {
 
   TOTAL_ENVELOPES: 10,
   TROLL_CHANCE: 0.2,
+  SPECIAL_CHANCE: 0.05,
   MONEY_CHANCE: 0.4,
+  SPECIAL_CONFETTI_COUNT: 420,
+
+  SOUND_CLICK_SRC: '/assets/audio/click.mp3',
+  SOUND_WIN_SRC: '/assets/audio/win.mp3',
+  SOUND_TROLL_SRC: '/assets/audio/troll.mp3',
+  SOUND_SPECIAL_SRC: '/assets/audio/special.mp3',
 
   LOCK_DURATION_DAYS: 365,
   EVENT_LOCK_DURATION_HOURS: 24,
@@ -124,7 +131,10 @@ Y nghia nhanh:
 - `OPEN_GATE_ALLOW_QUIZ: true` -> cho choi quiz khi dang cho mo cua.
 - `TOTAL_ENVELOPES` -> so bao li xi moi round.
 - `TROLL_CHANCE` -> ti le troll.
-- `MONEY_CHANCE` -> ti le tien (phan con lai la joke).
+- `SPECIAL_CHANCE` -> ti le ra giai dac biet.
+- `MONEY_CHANCE` -> ti le tien thuong (phan con lai la joke).
+- `SPECIAL_CONFETTI_COUNT` -> mat do confetti khi ra giai dac biet.
+- `SOUND_*_SRC` -> duong dan file am thanh trong `assets/audio`.
 
 ## 6. Thu tu uu tien mode
 

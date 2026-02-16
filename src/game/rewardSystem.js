@@ -30,6 +30,13 @@ const HOVER_QUOTES = [
 ];
 
 const MONEY_REWARDS = ['99.999đ', '50.000đ', '100.000đ', '80.000đ'];
+const SPECIAL_REWARD = '2.026.000đ';
+const SPECIAL_BLESSINGS = [
+    'Chúc bạn năm mới bình an, vững lòng trước mọi thử thách. 🌟',
+    'Chúc công việc hanh thông, làm gì cũng gặp quý nhân trợ giúp. 🤝',
+    'Chúc gia đình luôn ấm êm, sức khỏe dồi dào, tiếng cười đầy nhà. ❤️',
+    'Chúc tài lộc bền vững, niềm vui đến đều mỗi ngày. 🍀'
+];
 
 const JOKE_REWARDS = [
     'Bạn vừa nhận được năng lượng ngủ nướng +100 😴',
@@ -63,17 +70,26 @@ export function getHoverQuote() {
 export function createEnvelopeSet() {
     const selectedFaces = Array.from({ length: APP_CONFIG.totalEnvelopes }, () => randomItem(ENVELOPE_FACES));
     const trollChance = APP_CONFIG.probabilities.trollChance;
-    const moneyThreshold = trollChance + APP_CONFIG.probabilities.moneyChance;
+    const specialThreshold = trollChance + APP_CONFIG.probabilities.specialChance;
+    const moneyThreshold = specialThreshold + APP_CONFIG.probabilities.moneyChance;
+    let specialAssigned = false;
 
     return selectedFaces.map((face, index) => {
         const roll = Math.random();
         const isTroll = roll < trollChance;
-        const isMoney = !isTroll && roll < moneyThreshold;
+        const isSpecialCandidate = !isTroll && roll < specialThreshold;
+        const isSpecial = isSpecialCandidate && !specialAssigned;
+        const isMoney = !isTroll && !isSpecial && roll < moneyThreshold;
+
+        if (isSpecial) {
+            specialAssigned = true;
+        }
 
         return {
             index,
             face,
             isTroll,
+            isSpecial,
             isMoney,
             opened: false
         };
@@ -93,6 +109,25 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
                 streak: 0,
                 blessing: 'Chúc bạn năm mới cười tươi, lộc thật sẽ tới sau nhé! 🍀',
                 confettiCount: APP_CONFIG.effects.confetti.troll
+            }
+        };
+    }
+
+    if (envelope.isSpecial) {
+        const nextStreak = currentStreak + 2;
+
+        return {
+            nextStreak,
+            result: {
+                type: 'special',
+                icon: '👑',
+                title: `GIẢI ĐẶC BIỆT: ${SPECIAL_REWARD}`,
+                text: 'Bạn vừa mở trúng giải to nhất mùa Tết này! 🎆',
+                claimNote: '✨ Giải đặc biệt đã chốt. Không cần bốc lại nữa nha!',
+                streak: nextStreak,
+                blessing: 'Phúc - Lộc - Thọ hội tụ, năm nay chắc chắn khởi sắc! 🏮',
+                blessingList: SPECIAL_BLESSINGS,
+                confettiCount: APP_CONFIG.effects.confetti.special
             }
         };
     }

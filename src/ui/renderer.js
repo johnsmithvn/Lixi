@@ -65,6 +65,10 @@ function getLockedHint(mode) {
 }
 
 function getDefaultBlessing(resultType) {
+    if (resultType === 'special') {
+        return 'Phúc - Lộc - Thọ hội tụ, năm nay chắc chắn khởi sắc! 🏮';
+    }
+
     if (resultType === 'money') {
         return 'Chúc bạn năm mới tài lộc đầy nhà, tiền vô như nước! 🎊';
     }
@@ -77,6 +81,10 @@ function getDefaultBlessing(resultType) {
 }
 
 function getResultBadge(resultType) {
+    if (resultType === 'special') {
+        return { text: '👑 Giải đặc biệt', tone: 'special' };
+    }
+
     if (resultType === 'money') {
         return { text: '💰 Trúng lộc to', tone: 'money' };
     }
@@ -155,17 +163,23 @@ function createLatestResultBlock(result, heading = '🎉 Kết quả gần nhấ
         latestBlock.appendChild(detail);
     }
 
-    if (result.type === 'money' && result.claimNote) {
+    if ((result.type === 'money' || result.type === 'special') && result.claimNote) {
         const claim = document.createElement('p');
         claim.className = 'latest-result-claim';
         claim.textContent = result.claimNote;
         latestBlock.appendChild(claim);
     }
 
-    const blessing = document.createElement('p');
-    blessing.className = 'latest-result-blessing';
-    blessing.textContent = result.blessing ?? getDefaultBlessing(result.type);
-    latestBlock.appendChild(blessing);
+    const blessingItems = Array.isArray(result.blessingList) && result.blessingList.length > 0
+        ? result.blessingList
+        : [result.blessing ?? getDefaultBlessing(result.type)];
+
+    blessingItems.forEach((item) => {
+        const blessing = document.createElement('p');
+        blessing.className = 'latest-result-blessing';
+        blessing.textContent = item;
+        latestBlock.appendChild(blessing);
+    });
 
     return latestBlock;
 }
