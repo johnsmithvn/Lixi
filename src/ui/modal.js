@@ -10,6 +10,9 @@ export function createModalController() {
         refs.resultIcon = document.getElementById('result-icon');
         refs.resultMain = document.getElementById('result-main');
         refs.resultSub = document.getElementById('result-sub');
+        refs.specialNote = document.getElementById('special-note');
+        refs.specialNoteImage = document.getElementById('special-note-image');
+        refs.specialNoteText = document.getElementById('special-note-text');
         refs.resultClaimNote = document.getElementById('result-claim-note');
         refs.resultStreak = document.getElementById('result-streak');
         refs.trollReveal = document.getElementById('troll-reveal');
@@ -58,14 +61,22 @@ export function createModalController() {
             refs.resultSub.textContent = [result.text, ...blessingLines].join('\n');
         }
         refs.resultSub.classList.remove('strike');
+        refs.specialNote.classList.add('hidden');
         refs.resultClaimNote.classList.add('hidden');
         refs.resultClaimNote.textContent = '';
+        refs.specialNoteText.textContent = '';
 
         refs.resultStreak.textContent = result.type === 'special'
             ? '👑 Giải đặc biệt đã kích hoạt. Năm nay quá rực rỡ!'
             : result.type === 'money'
             ? `🔥 Chuỗi may mắn: x${result.streak}`
             : 'Chuỗi may mắn hiện tại: x0';
+
+        if (result.type === 'special') {
+            refs.specialNoteImage.src = '/assets/images/daudau.png';
+            refs.specialNoteText.textContent = 'Chúc mừng! Bạn vừa móc được túi mình thành công';
+            refs.specialNote.classList.remove('hidden');
+        }
 
         if (result.type === 'money' || result.type === 'special') {
             refs.resultClaimNote.textContent = result.claimNote ?? '📸 Chụp ảnh màn hình gửi chủ thớt để lĩnh xèng nha!';

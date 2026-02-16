@@ -405,6 +405,18 @@ h1 {
     line-height: 1.5;
 }
 
+.result-image-wrap {
+    margin-top: 12px;
+}
+
+.result-image {
+    display: block;
+    width: min(240px, 86%);
+    margin: 0 auto;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(142, 73, 36, 0.28);
+}
+
 .latest-result {
     margin-top: 12px;
     border-radius: 16px;
@@ -743,6 +755,30 @@ h1 {
 .result-sub.strike {
     text-decoration: line-through;
     opacity: 0.58;
+}
+
+.special-note {
+    margin-top: 12px;
+    border-radius: 14px;
+    padding: 10px 12px;
+    background: rgba(255, 192, 85, 0.16);
+    border: 1px solid rgba(236, 162, 51, 0.28);
+}
+
+.special-note-image {
+    display: block;
+    width: min(220px, 68%);
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(189, 110, 39, 0.22);
+}
+
+.special-note-text {
+    margin-top: 8px;
+    color: #8a3728;
+    font-size: 0.94rem;
+    font-weight: 800;
+    line-height: 1.4;
 }
 
 .result-claim-note {

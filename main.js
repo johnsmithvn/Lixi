@@ -313,7 +313,7 @@ function handleEnvelopeOpenRequest(payload) {
     openFlow.open({
         index: payload.index,
         element: payload.element,
-        faceEmoji: envelope.face?.emoji ?? '🧧',
+        faceEmoji: envelope.face?.modalEmoji ?? envelope.face?.emoji ?? '🧧',
         faceLabel: envelope.face?.label ?? 'Bao li xi',
         quote: game.getHoverQuote(),
         talkStepEnabled: APP_CONFIG.openFlow.talkStepEnabled,

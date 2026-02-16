@@ -117,6 +117,29 @@ function getLockStopMessage(reason) {
     return null;
 }
 
+function getResultImageSrc(resultType) {
+    if (resultType === 'money' || resultType === 'special') {
+        return '/assets/images/dautim.jpg';
+    }
+
+    return '/assets/images/leuleu.jpg';
+}
+
+function createResultImage(resultType) {
+    const imageWrap = document.createElement('div');
+    imageWrap.className = 'result-image-wrap';
+
+    const image = document.createElement('img');
+    image.className = 'result-image';
+    image.src = getResultImageSrc(resultType);
+    image.alt = resultType === 'money' || resultType === 'special'
+        ? 'Ảnh chúc mừng trúng lộc'
+        : 'Ảnh vui nhộn an ủi';
+
+    imageWrap.appendChild(image);
+    return imageWrap;
+}
+
 function createLatestResultBlock(result, heading = '🎉 Kết quả gần nhất của bạn') {
     if (!result || (!result.title && !result.text)) {
         return null;
@@ -135,6 +158,7 @@ function createLatestResultBlock(result, heading = '🎉 Kết quả gần nhấ
     badgeEl.className = `latest-result-badge latest-result-badge--${badge.tone}`;
     badgeEl.textContent = badge.text;
     latestBlock.appendChild(badgeEl);
+    latestBlock.appendChild(createResultImage(result.type));
 
     const resultMain = document.createElement('p');
     resultMain.className = 'latest-result-main';
@@ -293,7 +317,7 @@ export function createRenderer() {
 
         refs.gameTitle.textContent = isMoneyReroll
             ? '🧧 Bạn đã trúng rồi, muốn bốc lại không?'
-            : '🧧 Hôm nay vận may chưa mỉm cười...';
+            : '🧧 Vận may đang khởi động lại….';
         refs.gameSubtitle.textContent = isMoneyReroll
             ? 'Vượt quiz để mở thêm 1 bao và ghi đè kết quả cũ.'
             : 'Nhưng bạn có thể thử thêm 1 cơ hội nữa!';

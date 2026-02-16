@@ -17,9 +17,16 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.8.6`
+**Current:** `0.8.7`
 
 ## 4. Lich su thay doi
+
+## [0.8.7] - 2026-02-16
+
+### Changed
+- Them `modalEmoji` rieng cho tung `ENVELOPE_FACES`.
+- Open flow modal (step TALK) uu tien hien `modalEmoji` thay vi emoji tren bao.
+- Emoji tren the bao ngoai grid giu nguyen nhu cu, chi doi phan hien thi trong modal.
 
 ## [0.8.6] - 2026-02-16
 

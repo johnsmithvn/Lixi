@@ -2,18 +2,18 @@
 import { randomItem } from '../utils/random.js';
 
 const ENVELOPE_FACES = [
-    { emoji: '😎', label: 'Bao Ngầu' },
-    { emoji: '😴', label: 'Bao Buồn Ngủ' },
-    { emoji: '🤪', label: 'Bao Tăng Động', hyperShake: true },
-    { emoji: '🥰', label: 'Bao Dễ Thương' },
-    { emoji: '🤑', label: 'Bao Đại Gia' },
-    { emoji: '😏', label: 'Bao Bí Ẩn' },
-    { emoji: '🥺', label: 'Bao Tội Nghiệp' },
-    { emoji: '😤', label: 'Bao Giận Dỗi' },
-    { emoji: '🤡', label: 'Bao Hề' },
-    { emoji: '😋', label: 'Bao Háu Ăn' },
-    { emoji: '🤡', label: 'Bao Khôn Lanh' },
-    { emoji: '👻', label: 'Bao Lầy Lội' }
+    { emoji: '😎', label: 'Bao Ngầu', modalEmoji: 'ദ്ദി◝ ⩊ ◜.ᐟ' },
+    { emoji: '😴', label: 'Bao Buồn Ngủ', modalEmoji: 'ദ്ദി(˵ •̀ ᴗ - ˵ ) ✧' },
+    { emoji: '🤪', label: 'Bao Tăng Động', hyperShake: true, modalEmoji: '(˶ˆᗜˆ˵)' },
+    { emoji: '🥰', label: 'Bao Dễ Thương', modalEmoji: '(づ> v <)づ♡' },
+    { emoji: '🤑', label: 'Bao Đại Gia', modalEmoji: '≽^•⩊•^≼' },
+    { emoji: '😏', label: 'Bao Bí Ẩn', modalEmoji: '(,,>﹏<,,)' },
+    { emoji: '🥺', label: 'Bao Tội Nghiệp', modalEmoji: '৻( •̀ ᗜ •́ ৻)' },
+    { emoji: '😤', label: 'Bao Giận Dỗi', modalEmoji: '( •̯́ ₃ •̯̀)' },
+    { emoji: '🤡', label: 'Bao Hề', modalEmoji: '(„• ֊ •„)੭' },
+    { emoji: '😋', label: 'Bao Háu Ăn', modalEmoji: 'ฅ^>⩊<^ ฅ' },
+    { emoji: '🤡', label: 'Bao Khôn Lanh', modalEmoji: '(╥﹏╥)' },
+    { emoji: '👻', label: 'Bao Lầy Lội', modalEmoji: '(˶˃𐃷˂˶)' }
 ];
 
 const HOVER_QUOTES = [
@@ -29,8 +29,8 @@ const HOVER_QUOTES = [
     'Bốc tui xong nhớ giữ phong độ may mắn nha ✨'
 ];
 
-const MONEY_REWARDS = ['99.999đ', '50.000đ', '100.000đ', '80.000đ'];
-const SPECIAL_REWARD = '2.026.000đ';
+const MONEY_REWARDS = ['99.999đ', '8386000đ'];
+const SPECIAL_REWARD = '100000đ';
 const SPECIAL_BLESSINGS = [
     'Chúc bạn năm mới bình an, vững lòng trước mọi thử thách. 🌟',
     'Chúc công việc hanh thông, làm gì cũng gặp quý nhân trợ giúp. 🤝',

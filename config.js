@@ -44,7 +44,7 @@
 
     // ===== OPEN GATE (THOI GIAN MO CUA WEB) =====
     // Bat/tat che do cho mo cua theo thoi gian.
-    OPEN_GATE_ENABLED: true,
+    OPEN_GATE_ENABLED: false,
     // Dinh dang de xuat: '2026-02-20T20:00:00+07:00'
     OPEN_GATE_AT: '2026-02-17T00:00:00+07:00',
     // Cho phep choi quiz trong luc cho mo cua.
