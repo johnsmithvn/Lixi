@@ -15,6 +15,23 @@ function asPositiveNumber(value, fallback) {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function asProbability(value, fallback) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+        return fallback;
+    }
+
+    if (parsed < 0) {
+        return 0;
+    }
+
+    if (parsed > 1) {
+        return 1;
+    }
+
+    return parsed;
+}
+
 function asBooleanTrue(value) {
     return value === true;
 }
@@ -106,12 +123,16 @@ const runtimeMode = resolveModeFromQuery(allowQueryOverride)
     ?? configuredModeFromText
     ?? GAME_MODES.LOCKED;
 
+const trollChance = asProbability(globalConfig.TROLL_CHANCE, 0.2);
+const configuredMoneyChance = asProbability(globalConfig.MONEY_CHANCE, 0.4);
+const moneyChance = Math.min(1 - trollChance, configuredMoneyChance);
+
 export const APP_CONFIG = {
-    totalEnvelopes: 6,
+    totalEnvelopes: asPositiveNumber(globalConfig.TOTAL_ENVELOPES, 10),
     speechDebounceMs: 350,
     probabilities: {
-        trollChance: 0.3,
-        moneyChanceWhenNotTroll: 0.55
+        trollChance,
+        moneyChance
     },
     timings: {
         speechHideMs: 550,
@@ -130,6 +151,10 @@ export const APP_CONFIG = {
     },
     storage: {
         bestStreakKey: 'lixi_best_streak_v1'
+    },
+    quiz: {
+        enabledInLockedMode: globalConfig.ENABLE_EXTRA_CHANCE_QUIZ !== false,
+        maxAttempts: asPositiveNumber(globalConfig.QUIZ_MAX_ATTEMPTS, 3)
     },
     gameMode: {
         mode: runtimeMode,

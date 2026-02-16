@@ -26,9 +26,13 @@ export function createEnvelopeElement(envelope, handlers) {
     card.appendChild(face);
     card.appendChild(label);
 
-    card.addEventListener('mouseenter', () => handlers.onHover(envelope.index));
-    card.addEventListener('mouseleave', handlers.onLeave);
-    card.addEventListener('click', () => handlers.onOpen(envelope.index, card));
+    if (envelope.opened) {
+        card.classList.add('opened');
+    } else {
+        card.addEventListener('mouseenter', () => handlers.onHover(envelope.index));
+        card.addEventListener('mouseleave', handlers.onLeave);
+        card.addEventListener('click', () => handlers.onOpen(envelope.index, card));
+    }
 
     return card;
 }

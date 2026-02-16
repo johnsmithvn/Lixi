@@ -17,8 +17,8 @@
             <div class="welcome-content">
                 <div class="lantern lantern-left">🏮</div>
                 <div class="lantern lantern-right">🏮</div>
-                <div class="welcome-emoji">🧧</div>
-                <h1>Chào mừng tới<br><span class="highlight">Máy Lì Xì PRO++</span></h1>
+                <div class="welcome-emoji">2026</div>
+                <h1>Chào mừng tới<br><span class="highlight">Lì Xì 4.0 – Auto Phát Lộc</span></h1>
                 <p class="subtitle">Bốc thử một bao để xem vận may hôm nay gọi tên ai.</p>
                 <button id="start-btn" class="btn-start" type="button">
                     🎉 Bắt đầu bốc 🎉
@@ -31,7 +31,7 @@
             <p class="game-subtitle">Hover để nghe bao nói, click để mở!</p>
 
             <div class="game-hud">
-                <p id="opened-counter">Đã mở: 0/6</p>
+                <p id="opened-counter">Đã mở: 0/10</p>
                 <p id="streak-counter">🔥 Chuỗi may mắn: x0</p>
             </div>
 
@@ -49,12 +49,47 @@
             <div id="result-icon" class="result-icon"></div>
             <div id="result-main" class="result-main"></div>
             <div id="result-sub" class="result-sub"></div>
+            <div id="result-claim-note" class="result-claim-note hidden"></div>
             <div id="result-streak" class="result-streak"></div>
             <div id="troll-reveal" class="troll-reveal hidden"></div>
 
             <div class="modal-actions">
+                <button id="extra-chance-btn" class="btn-extra hidden" type="button">🎯 Thử vận may lần nữa</button>
                 <button id="play-again-btn" class="btn-again" type="button">🔄 Bốc lại nào!</button>
                 <button id="share-btn" class="btn-share" type="button">📤 Gửi cho bạn bè troll</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-modal" class="quiz-modal hidden" role="dialog" aria-modal="true" aria-labelledby="quiz-question">
+        <div class="quiz-backdrop" data-close-quiz="true"></div>
+        <div class="quiz-sheet">
+            <p id="quiz-step-label" class="quiz-step-label">🎯 Mini Quiz - Cơ hội thêm</p>
+            <h3 id="quiz-question" class="quiz-question"></h3>
+            <div id="quiz-kind-picker" class="quiz-kind-picker hidden">
+                <div id="quiz-kind-list" class="quiz-kind-list"></div>
+            </div>
+            <div id="quiz-media-container" class="quiz-media-container hidden"></div>
+            <div id="quiz-word-form" class="quiz-word-form hidden">
+                <p id="quiz-word-hint" class="quiz-word-hint"></p>
+                <p id="quiz-word-scrambled" class="quiz-word-scrambled"></p>
+                <div id="quiz-word-slots" class="quiz-word-slots"></div>
+                <div id="quiz-word-bank" class="quiz-word-bank"></div>
+                <div class="quiz-word-row">
+                    <button id="quiz-word-reset" class="quiz-word-reset" type="button">Xóa hết</button>
+                    <button id="quiz-word-submit" class="quiz-word-submit" type="button">Trả lời</button>
+                </div>
+            </div>
+            <div id="quiz-answers" class="quiz-answers"></div>
+
+            <div id="quiz-feedback" class="quiz-feedback hidden">
+                <p id="quiz-feedback-title" class="quiz-feedback-title"></p>
+                <p id="quiz-feedback-text" class="quiz-feedback-text"></p>
+            </div>
+
+            <div class="quiz-actions">
+                <button id="quiz-cancel-btn" class="quiz-cancel-btn" type="button">Để mình suy nghĩ lại</button>
+                <button id="quiz-continue-btn" class="quiz-continue-btn hidden" type="button">Tiếp tục</button>
             </div>
         </div>
     </div>

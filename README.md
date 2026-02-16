@@ -1,46 +1,48 @@
-# Lixi PRO++ (Web Li Xi)
+﻿# Lixi PRO++ (Web Li Xi)
 
-Web mini-game li xi theo phong cach mobile-first, tap trung vao game-feel (animation, confetti, vibration, sound), mode system (FREE/LOCKED/EVENT/TEST) va kien truc tach module de mo rong de dang.
+Web mini-game li xi theo huong mobile-first, module architecture, va mode lock linh hoat.
 
-## 1. Tong Quan
+## 1. Tong quan
 
-- Cong nghe: HTML, CSS, JavaScript ES Modules (khong can framework).
-- Runtime: Chay duoc tren static hosting (Vercel/Netlify/GitHub Pages) hoac local static server.
-- Muc tieu UX:
-  - Mo bao co cam giac game: reveal animation, confetti, streak.
-  - Co co che "van menh" bang localStorage de han che spam refresh.
-  - Co mode linh hoat de doi behavior nhanh khi deploy.
+- Tech: HTML + CSS + JavaScript ES Modules.
+- Khong can backend.
+- Chay tren static hosting (Vercel, Netlify, GitHub Pages) hoac local static server.
 
-## 2. Tinh Nang Chinh
+## 2. Tinh nang hien tai
 
-- Welcome screen + game screen + result modal.
-- Envelope interactions:
-  - Hover quote (desktop) + debounce.
-  - Click mo bao + reveal zoom vao center.
-- Reward system:
-  - Money / Joke / Troll jackpot.
-  - Lucky code cho tung ket qua.
-  - Streak system + confetti tang cuong khi streak cao.
-- Effects:
-  - Confetti canvas.
-  - Vibration tren mobile.
-  - Sound effect (co fallback tone bang WebAudio neu chua gan file mp3).
-- Share ket qua:
-  - Su dung Web Share API neu ho tro.
-  - Fallback copy clipboard.
-- Game mode system:
-  - `FREE`: choi tu do.
-  - `LOCKED`: khoa sau lan choi, mo lai sau chu ky lock mac dinh (1 nam).
-  - `EVENT`: khoa theo chu ky su kien (mac dinh 24h).
-  - `TEST`: khoa ngan de test (mac dinh 60s).
-- Locked screen:
-  - Hien thong diep de thuong.
-  - Hien ket qua gan nhat ro rang + vui nhon + co loi chuc + thoi diem mo lai.
+- Mo bao li xi voi animation reveal + confetti + vibration + sound.
+- Reward gom 3 nhom:
+  - `money`
+  - `troll`
+  - `joke`
+- Streak system + best streak luu localStorage.
+- Share ket qua qua Web Share API (co fallback clipboard).
+- Mode system:
+  - `FREE`
+  - `LOCKED`
+  - `EVENT`
+  - `TEST`
+- LOCKED mode co `Quiz Extra Chance`:
+  - Neu lan dau mo ra `troll`/`joke`, user duoc quiz 1 cau.
+  - Dung: them 1 luot mo bao.
+  - Sai: khoa luot.
+- Quiz chi ho tro `text` va `image` (khong ho tro video).
 
-## 3. Cau Truc Thu Muc
+## 3. UX quiz (theo y tuong moi)
+
+- Moi lan chi hien thi 1 cau hoi.
+- Copy feedback:
+  - Dung: `🎉 Chinh xac! Vu tru cho ban them 1 co hoi!`
+  - Sai: `😆 Hoi thieu mot chut! Van may dung lai o day nhe~`
+- Neu sai, khong show text "Sai" theo kieu tieu cuc.
+
+## 4. Cau truc thu muc
 
 ```text
 .
+|-- assets
+|   `-- images
+|       `-- banhchung.svg
 |-- config.js
 |-- index.html
 |-- main.js
@@ -57,60 +59,22 @@ Web mini-game li xi theo phong cach mobile-first, tap trung vao game-feel (anima
     |-- game
     |   |-- gameEngine.js
     |   |-- gameMode.js
+    |   |-- quizData.js
+    |   |-- quizEngine.js
     |   `-- rewardSystem.js
     |-- ui
     |   |-- envelope.js
     |   |-- modal.js
+    |   |-- quizModal.js
     |   `-- renderer.js
     `-- utils
         |-- random.js
         `-- storage.js
 ```
 
-## 4. Kien Truc He Thong
+## 5. Config de sua nhanh (true/false)
 
-### 4.1 `main.js` (composition root)
-
-- Khoi tao renderer, modal, game engine, sound, confetti.
-- Dang ky event qua event bus.
-- Dieu phoi flow:
-  - Start session.
-  - Render round.
-  - Open envelope -> reveal -> show result.
-  - Handle locked state.
-
-### 4.2 `src/core`
-
-- `config.js`: tong hop config runtime + mode + timing + effect + storage keys.
-- `eventBus.js`: pub/sub nhe de tach logic va UI.
-- `state.js`: state runtime cua session/round.
-
-### 4.3 `src/game`
-
-- `rewardSystem.js`: random data (faces, quotes, rewards) va resolve ket qua.
-- `gameMode.js`: lock/fate logic theo mode, su dung localStorage.
-- `gameEngine.js`: nghiep vu game chinh, emit cac event `round:ready`, `state:updated`, `session:locked`.
-
-### 4.4 `src/ui`
-
-- `renderer.js`: render game screen, envelopes, speech, locked screen.
-- `envelope.js`: tao DOM envelope + reveal animation.
-- `modal.js`: hien/an result modal + feedback share.
-
-### 4.5 `src/effects`
-
-- `confetti.js`: canvas confetti engine.
-- `sound.js`: phat am thanh tu `<audio>`, fallback tone.
-- `vibration.js`: rung thiet bi neu browser ho tro.
-
-### 4.6 `src/utils`
-
-- `random.js`: random helpers (shuffle, pick).
-- `storage.js`: wrapper localStorage (number/json).
-
-## 5. Cau Hinh Runtime
-
-File: `config.js` (root).
+File: `config.js`
 
 ```js
 window.APP_CONFIG = {
@@ -118,104 +82,111 @@ window.APP_CONFIG = {
   EVENT_MODE: false,
   TEST_MODE: false,
   ENABLE_LOCK: true,
+
   MODE: 'LOCKED',
   ALLOW_QUERY_OVERRIDE: true,
+  ENABLE_EXTRA_CHANCE_QUIZ: true,
+  QUIZ_MAX_ATTEMPTS: 3,
+
+  TOTAL_ENVELOPES: 10,
+  TROLL_CHANCE: 0.2,
+  MONEY_CHANCE: 0.4,
+
   LOCK_DURATION_DAYS: 365,
   EVENT_LOCK_DURATION_HOURS: 24,
   TEST_LOCK_DURATION_SECONDS: 60,
+
   FATE_STORAGE_KEY: 'lixi_fate_2026'
 };
 ```
 
-### 5.1 Meaning
+Y nghia nhanh:
 
-- `FREE_MODE`: `true` = mo free mode ngay.
-- `EVENT_MODE`: `true` = lock theo chu ky event.
-- `TEST_MODE`: `true` = lock ngan de test.
-- `ENABLE_LOCK`: `false` = free mode.
-- `MODE`: fallback mode khi khong dung cờ boolean.
-- `ALLOW_QUERY_OVERRIDE`: cho phep test nhanh bang query.
-- `LOCK_DURATION_DAYS`: thoi gian lock cho `LOCKED`.
-- `EVENT_LOCK_DURATION_HOURS`: thoi gian lock cho `EVENT`.
-- `TEST_LOCK_DURATION_SECONDS`: thoi gian lock cho `TEST`.
-- `FATE_STORAGE_KEY`: key localStorage luu fate.
+- `FREE_MODE: true` -> mo free mode ngay.
+- `EVENT_MODE: true` -> lock theo gio event.
+- `TEST_MODE: true` -> lock ngan de test.
+- `ENABLE_LOCK: false` -> tuong duong free mode.
+- `ENABLE_EXTRA_CHANCE_QUIZ: false` -> tat mini-quiz extra chance.
+- `QUIZ_MAX_ATTEMPTS` -> so lan tra loi quiz toi da.
+- `TOTAL_ENVELOPES` -> so bao li xi moi round.
+- `TROLL_CHANCE` -> ti le troll.
+- `MONEY_CHANCE` -> ti le tien (phan con lai la joke).
 
-### 5.2 Query override
+## 6. Thu tu uu tien mode
 
-Neu `ALLOW_QUERY_OVERRIDE = true`, co the test nhanh:
+He thong resolve mode theo thu tu:
+
+1. Query `?mode=` (neu `ALLOW_QUERY_OVERRIDE = true`)
+2. Boolean flags (`FREE_MODE`, `EVENT_MODE`, `TEST_MODE`, `ENABLE_LOCK`)
+3. `MODE`
+4. Mac dinh `LOCKED`
+
+Gia tri query hop le:
 
 - `?mode=free`
 - `?mode=locked`
 - `?mode=event`
 - `?mode=test`
 
-### 5.3 Thu Tu Uu Tien (Quan Trong)
+## 7. LocalStorage keys
 
-He thong resolve mode theo thu tu:
+- `lixi_best_streak_v1`: best streak.
+- `lixi_fate_2026` (hoac key custom): lock state theo mode.
 
-1. Query param `?mode=...` (neu `ALLOW_QUERY_OVERRIDE = true`).
-2. Cac co boolean (`FREE_MODE`, `EVENT_MODE`, `TEST_MODE`, `ENABLE_LOCK`).
-3. `MODE` string.
-4. Mac dinh `LOCKED`.
+## 8. Them cau hoi quiz moi
 
-Vi du de de chinh:
+Sua file: `src/game/quizData.js`
 
-- Choi free: `FREE_MODE: true`
-- Event 24h: `EVENT_MODE: true` va `FREE_MODE: false`
-- Test 60s: `TEST_MODE: true` va hai flag con lai `false`
+Mau `text`:
 
-## 6. LocalStorage Keys
-
-- `lixi_best_streak_v1`: luu best streak.
-- `lixi_fate_2026` (hoac key custom): luu fate lock state.
-
-Gia tri fate mau:
-
-```json
+```js
 {
-  "mode": "LOCKED",
-  "playedAt": 1760000000000,
-  "expireAt": 1791536000000,
-  "result": {
-    "type": "money",
-    "title": "Ban nhan duoc: 100.000d",
-    "text": "Dau nam boc trung loc!",
-    "blessing": "Chuc ban nam moi tai loc day nha!"
-  }
+  id: 'q_text_1',
+  type: 'text',
+  question: 'Tet thuong co may ngay nghi chinh thuc?',
+  media: null,
+  answers: [
+    { text: '1 ngay', correct: false },
+    { text: '3 ngay', correct: true },
+    { text: '7 ngay', correct: false }
+  ]
 }
 ```
 
-## 7. Cach Chay Local
+Mau `image`:
 
-Du an la static site, dung bat ky static server nao.
+```js
+{
+  id: 'q_image_1',
+  type: 'image',
+  question: 'Trong hinh la mon gi ngay Tet?',
+  media: '/assets/images/banhchung.svg',
+  answers: [
+    { text: 'Banh chung', correct: true },
+    { text: 'Pizza', correct: false }
+  ]
+}
+```
 
-Vi du voi VS Code Live Server hoac:
+Luu y:
+
+- Khong dung `type: 'video'`.
+- Moi cau can it nhat 2 dap an.
+- Moi cau nen co dung 1 dap an `correct: true`.
+
+## 9. Chay local
 
 ```powershell
-# Option 1: Python
+# Option 1
 python -m http.server 8080
 
-# Option 2: Node (neu da co npx)
+# Option 2
 npx serve .
 ```
 
-Sau do mo `http://localhost:8080`.
+Mo `http://localhost:8080`.
 
-## 8. Deploy Vercel (Static)
+## 10. Versioning
 
-- Framework Preset: `Other`.
-- Build Command: de trong.
-- Output Directory: de trong.
-- Chinh mode bang cach sua `config.js` roi redeploy.
-
-## 9. Quy Uoc Versioning
-
-- Dung Semantic Versioning: `MAJOR.MINOR.PATCH`.
-- Moi thay doi phai cap nhat `CHANGE4LOG.md`.
-- Tham chieu section huong dan trong `CHANGE4LOG.md`.
-
-## 10. Huong Phat Trien Tiep
-
-- Them animation flow 2-step/3-step drama cho mobile.
-- Gan file mp3 that cho `click-sfx`, `win-sfx`, `troll-sfx`.
-- Them test nhe cho logic mode va storage wrappers.
+- Dung Semantic Versioning.
+- Moi thay doi can cap nhat `CHANGE4LOG.md`.

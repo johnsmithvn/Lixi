@@ -82,7 +82,7 @@ function getResultBadge(resultType) {
     }
 
     if (resultType === 'troll') {
-        return { text: '🤡 Troll nhẹ', tone: 'troll' };
+        return { text: '😜 Troll thôi', tone: 'troll' };
     }
 
     return { text: '😂 Quà tinh thần', tone: 'joke' };
@@ -95,6 +95,79 @@ function extractMoneyAmount(title) {
 
     const match = title.match(/([0-9][0-9.,]*đ)/i);
     return match ? match[1] : null;
+}
+
+function getLockStopMessage(reason) {
+    if (reason === 'quiz_failed') {
+        return 'May mắn tạm nghỉ giữa hiệp 😌. IB chủ thớt để mở khóa ';
+    }
+
+    if (reason === 'second_miss') {
+        return 'Vận may đang ngủ trưa… nhắn chủ thớt đánh thức giúp!';
+    }
+
+    return null;
+}
+
+function createLatestResultBlock(result, heading = '🎉 Kết quả gần nhất của bạn') {
+    if (!result || (!result.title && !result.text)) {
+        return null;
+    }
+
+    const latestBlock = document.createElement('section');
+    latestBlock.className = 'latest-result';
+
+    const latestTitle = document.createElement('h4');
+    latestTitle.className = 'latest-result-title';
+    latestTitle.textContent = heading;
+    latestBlock.appendChild(latestTitle);
+
+    const badge = getResultBadge(result.type);
+    const badgeEl = document.createElement('p');
+    badgeEl.className = `latest-result-badge latest-result-badge--${badge.tone}`;
+    badgeEl.textContent = badge.text;
+    latestBlock.appendChild(badgeEl);
+
+    const resultMain = document.createElement('p');
+    resultMain.className = 'latest-result-main';
+    resultMain.textContent = result.title ?? 'Bạn đã mở 1 bao lì xì.';
+    latestBlock.appendChild(resultMain);
+
+    const moneyAmount = result.type === 'money'
+        ? (extractMoneyAmount(result.title) ?? extractMoneyAmount(result.text))
+        : null;
+
+    if (moneyAmount) {
+        const amountEl = document.createElement('p');
+        amountEl.className = 'latest-result-amount';
+        amountEl.textContent = `Giá trị nổi bật: ${moneyAmount}`;
+        latestBlock.appendChild(amountEl);
+    }
+
+    const detailText = result.type === 'troll'
+        ? (result.reveal ?? result.text)
+        : result.text;
+
+    if (detailText) {
+        const detail = document.createElement('p');
+        detail.className = 'latest-result-detail';
+        detail.textContent = detailText;
+        latestBlock.appendChild(detail);
+    }
+
+    if (result.type === 'money' && result.claimNote) {
+        const claim = document.createElement('p');
+        claim.className = 'latest-result-claim';
+        claim.textContent = result.claimNote;
+        latestBlock.appendChild(claim);
+    }
+
+    const blessing = document.createElement('p');
+    blessing.className = 'latest-result-blessing';
+    blessing.textContent = result.blessing ?? getDefaultBlessing(result.type);
+    latestBlock.appendChild(blessing);
+
+    return latestBlock;
 }
 
 export function createRenderer() {
@@ -194,6 +267,54 @@ export function createRenderer() {
         }, APP_CONFIG.timings.speechHideMs);
     }
 
+    function showExtraChanceScreen(payload, handlers) {
+        const latestResult = payload?.result ?? null;
+        const quizStatus = payload?.quiz ?? null;
+        const maxAttempts = quizStatus?.maxAttempts ?? APP_CONFIG.quiz.maxAttempts;
+        const remainingAttempts = quizStatus?.remainingAttempts ?? maxAttempts;
+
+        showScreen('game-screen');
+        hideSpeech(true);
+
+        refs.gameTitle.textContent = '🧧 Hôm nay vận may chưa mỉm cười...';
+        refs.gameSubtitle.textContent = 'Nhưng bạn có thể thử thêm 1 cơ hội nữa!';
+
+        refs.openedCounter.textContent = '🎯 Bonus: Vượt quiz là được mở thêm 1 bao';
+        refs.streakCounter.textContent = `Mini Quiz: còn ${remainingAttempts}/${maxAttempts} lượt trả lời`;
+        refs.streakCounter.classList.remove('hot');
+
+        refs.envelopeGrid.classList.add('locked-grid');
+        refs.envelopeGrid.innerHTML = '';
+
+        const card = document.createElement('article');
+        card.className = 'locked-state';
+
+        const title = document.createElement('h3');
+        title.className = 'locked-title';
+        title.textContent = '🎯 Thử vận may lần nữa';
+
+        const message = document.createElement('p');
+        message.className = 'locked-text';
+        message.textContent = `Bạn có tối đa ${maxAttempts} lần trả lời. Trúng 1 câu là được mở thêm 1 bao.`;
+
+        card.appendChild(title);
+        card.appendChild(message);
+
+        const latestBlock = createLatestResultBlock(latestResult, 'Kết quả vừa rồi');
+        if (latestBlock) {
+            card.appendChild(latestBlock);
+        }
+
+        const actionBtn = document.createElement('button');
+        actionBtn.type = 'button';
+        actionBtn.className = 'extra-chance-btn';
+        actionBtn.textContent = '🎯 Chọn thể loại quiz';
+        actionBtn.addEventListener('click', handlers.onStartQuiz);
+
+        card.appendChild(actionBtn);
+        refs.envelopeGrid.appendChild(card);
+    }
+
     function showLockedScreen(lockState) {
         const mode = lockState?.mode ?? GAME_MODES.LOCKED;
         const fate = lockState?.fate ?? null;
@@ -225,46 +346,16 @@ export function createRenderer() {
         card.appendChild(title);
         card.appendChild(message);
 
-        if (fate?.result?.title || fate?.result?.text) {
-            const latestBlock = document.createElement('section');
-            latestBlock.className = 'latest-result';
+        const stopMessage = getLockStopMessage(fate?.meta?.reason);
+        if (stopMessage) {
+            const stopText = document.createElement('p');
+            stopText.className = 'locked-remaining';
+            stopText.textContent = stopMessage;
+            card.appendChild(stopText);
+        }
 
-            const latestTitle = document.createElement('h4');
-            latestTitle.className = 'latest-result-title';
-            latestTitle.textContent = '🎉 Kết quả gần nhất của bạn';
-            latestBlock.appendChild(latestTitle);
-
-            const badge = getResultBadge(fate?.result?.type);
-            const badgeEl = document.createElement('p');
-            badgeEl.className = `latest-result-badge latest-result-badge--${badge.tone}`;
-            badgeEl.textContent = badge.text;
-            latestBlock.appendChild(badgeEl);
-
-            const resultMain = document.createElement('p');
-            resultMain.className = 'latest-result-main';
-            resultMain.textContent = fate?.result?.title ?? 'Bạn đã mở 1 bao lì xì.';
-            latestBlock.appendChild(resultMain);
-
-            const moneyAmount = extractMoneyAmount(fate?.result?.title);
-            if (moneyAmount) {
-                const amountEl = document.createElement('p');
-                amountEl.className = 'latest-result-amount';
-                amountEl.textContent = `Giá trị nổi bật: ${moneyAmount}`;
-                latestBlock.appendChild(amountEl);
-            }
-
-            if (fate?.result?.text) {
-                const detail = document.createElement('p');
-                detail.className = 'latest-result-detail';
-                detail.textContent = fate.result.text;
-                latestBlock.appendChild(detail);
-            }
-
-            const blessing = document.createElement('p');
-            blessing.className = 'latest-result-blessing';
-            blessing.textContent = fate?.result?.blessing ?? getDefaultBlessing(fate?.result?.type);
-            latestBlock.appendChild(blessing);
-
+        const latestBlock = createLatestResultBlock(fate?.result, '🎉 Kết quả gần nhất của bạn');
+        if (latestBlock) {
             card.appendChild(latestBlock);
         }
 
@@ -295,6 +386,7 @@ export function createRenderer() {
         markEnvelopeOpened,
         showSpeech,
         hideSpeech,
-        showLockedScreen
+        showLockedScreen,
+        showExtraChanceScreen
     };
 }

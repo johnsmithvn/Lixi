@@ -21,6 +21,15 @@
     // Cho phep test nhanh bang URL: ?mode=free|locked|event|test
     ALLOW_QUERY_OVERRIDE: true,
 
+    // LOCKED mode: cho phep mini-quiz de them 1 co hoi.
+    ENABLE_EXTRA_CHANCE_QUIZ: true,
+    QUIZ_MAX_ATTEMPTS: 3,
+
+    // ===== GAME BALANCE =====
+    TOTAL_ENVELOPES: 10,
+    TROLL_CHANCE: 0.8, // 20%
+    MONEY_CHANCE: 0.1, // 40%
+
     // ===== LOCK DURATION (DANG DE DOC) =====
     LOCK_DURATION_DAYS: 365,
     EVENT_LOCK_DURATION_HOURS: 24,

@@ -11,9 +11,11 @@ export function createModalController() {
         refs.resultIcon = document.getElementById('result-icon');
         refs.resultMain = document.getElementById('result-main');
         refs.resultSub = document.getElementById('result-sub');
+        refs.resultClaimNote = document.getElementById('result-claim-note');
         refs.resultStreak = document.getElementById('result-streak');
         refs.trollReveal = document.getElementById('troll-reveal');
 
+        refs.extraChanceBtn = document.getElementById('extra-chance-btn');
         refs.playAgainBtn = document.getElementById('play-again-btn');
         refs.shareBtn = document.getElementById('share-btn');
     }
@@ -33,6 +35,7 @@ export function createModalController() {
     function init(handlers) {
         cacheRefs();
 
+        refs.extraChanceBtn.addEventListener('click', handlers.onExtraChance);
         refs.playAgainBtn.addEventListener('click', handlers.onPlayAgain);
         refs.shareBtn.addEventListener('click', () => handlers.onShare(latestResult));
 
@@ -58,13 +61,21 @@ export function createModalController() {
         refs.resultMain.textContent = result.title;
         refs.resultSub.textContent = result.text;
         refs.resultSub.classList.remove('strike');
+        refs.resultClaimNote.classList.add('hidden');
+        refs.resultClaimNote.textContent = '';
 
         refs.resultStreak.textContent = result.type === 'money'
             ? `🔥 Chuỗi may mắn: x${result.streak}`
             : 'Chuỗi may mắn hiện tại: x0';
 
+        if (result.type === 'money') {
+            refs.resultClaimNote.textContent = result.claimNote ?? '📸 Chụp ảnh màn hình gửi chủ thớt để lĩnh xèng nha!';
+            refs.resultClaimNote.classList.remove('hidden');
+        }
+
         refs.trollReveal.classList.add('hidden');
         refs.trollReveal.textContent = '';
+        refs.extraChanceBtn.classList.toggle('hidden', !options.showExtraChanceButton);
 
         if (result.type === 'troll') {
             trollRevealTimer = window.setTimeout(() => {
@@ -85,6 +96,8 @@ export function createModalController() {
         refs.modal.classList.add('hidden');
         document.body.classList.remove('modal-open');
         refs.shareBtn.textContent = '📤 Gửi cho bạn bè troll';
+        refs.extraChanceBtn.classList.add('hidden');
+        refs.resultClaimNote.classList.add('hidden');
     }
 
     function showShareFeedback(message) {

@@ -1,0 +1,173 @@
+﻿# CHANGE4LOG
+
+Tai lieu theo doi version va lich su thay doi.
+
+## 1. Quy uoc
+
+- Luon cap nhat file nay moi khi co thay doi.
+- Dung Semantic Versioning: `MAJOR.MINOR.PATCH`.
+- Ngay theo dinh dang `YYYY-MM-DD`.
+- Moi release gom 3 nhom: `Added`, `Changed`, `Fixed`.
+
+## 2. Cach tang version
+
+- Tang `PATCH` (`x.y.Z`) khi sua bug hoac update docs nho.
+- Tang `MINOR` (`x.Y.z`) khi them tinh nang moi (backward-compatible).
+- Tang `MAJOR` (`X.y.z`) khi co breaking change.
+
+## 3. Current Version
+
+**Current:** `0.6.1`
+
+## 4. Lich su thay doi
+
+## [0.6.1] - 2026-02-16
+
+### Changed
+- Khoi phuc troll jackpot ve dang:
+  - `BẠN TRÚNG JACKPOT!!!`
+  - `999.999.999đ`
+- Word Puzzle doi tu kieu nhap text sang kieu chon chu cai:
+  - Bam chu cai de dien vao o.
+  - Bam lai o da dien de go chu.
+  - Them nut `Xóa hết`.
+
+### Fixed
+- Man hinh khoa (`Ket qua gan nhat`) voi ket qua troll se uu tien hien `reveal` thay vi dong `999.999.999đ` de tranh hieu nham trung tien that.
+
+## [0.6.0] - 2026-02-16
+
+### Added
+- Them he thong chon the loai quiz truoc khi tra loi:
+  - `🧠 Trắc nghiệm`
+  - `🔤 Word Puzzle`
+- Them bo du lieu `word puzzle` trong `src/game/quizData.js`.
+- Them UI quiz moi:
+  - danh sach chon the loai
+  - o nhap dap an cho word puzzle
+  - hien thi tien trinh luot tra loi theo tung the loai.
+- Them thong diep claim khi trung tien:
+  - `📸 Chụp ảnh màn hình gửi chủ thớt để lĩnh xèng nha!`
+
+### Changed
+- Refactor `src/game/quizEngine.js` de ho tro:
+  - nhieu kieu quiz (`choice`, `word`)
+  - nhieu kieu input tra loi (`answerIndex`, `textAnswer`)
+- Cap nhat flow `main.js`:
+  - vao quiz se chon the loai truoc
+  - neu sai nhung con luot se duoc chon the loai lai.
+- Dieu chinh `troll jackpot` theo huong de thuong, giam cam giac trung tien that.
+
+### Fixed
+- Tranh hien thi thong diep troll de gay hieu nham trung giai lon.
+
+## [0.5.2] - 2026-02-16
+
+### Added
+- Them config game balance trong `config.js`:
+  - `TOTAL_ENVELOPES`
+  - `TROLL_CHANCE`
+  - `MONEY_CHANCE`
+  - `QUIZ_MAX_ATTEMPTS`
+
+### Changed
+- Tang so luong bao li xi mac dinh len `10`.
+- Chinh lai xac suat ket qua theo yeu cau:
+  - `money`: `40%`
+  - `troll`: `20%`
+  - `joke`: phan con lai
+- Cap nhat flow quiz extra chance:
+  - User co toi da `3` lan tra loi.
+  - Dung bat ky lan nao thi duoc mo them 1 bao.
+  - Sai se duoc tra loi tiep den khi het 3 lan moi khoa.
+- Cap nhat UI quiz de hien thi tien trinh luot (`1/3`, `2/3`, ...).
+
+### Fixed
+- Dam bao game tao du `10` bao ngay ca khi pool face nho hon.
+
+## [0.5.1] - 2026-02-16
+
+### Added
+- Cap nhat `README.md` mo ta ro `Quiz Extra Chance` va huong dan config true/false de sua nhanh.
+- Bo sung huong dan them cau hoi quiz (`text`/`image`) trong `README.md`.
+
+### Changed
+- Dong bo tai lieu voi code hien tai:
+  - Da bo logic lucky code.
+  - Da co cau truc module quiz (`quizData`, `quizEngine`, `quizModal`).
+
+### Fixed
+- Chinh lai tai lieu de tranh nham lan feature cu va feature moi.
+
+## [0.5.0] - 2026-02-16
+
+### Added
+- Them mini-game `Quiz Extra Chance` cho `LOCKED` mode:
+  - Sau ket qua `troll`/`joke` lan dau, user co the lam quiz 1 cau de mo them 1 bao.
+  - Quiz render dynamic tu `src/game/quizData.js`.
+  - Ho tro media `text` + `image` (khong dung video).
+- Them module moi:
+  - `src/game/quizData.js`
+  - `src/game/quizEngine.js`
+  - `src/ui/quizModal.js`
+- Them sample media asset: `assets/images/banhchung.svg`.
+
+### Changed
+- Refactor `gameEngine` de ho tro state cho extra chance:
+  - `played`, `hasMoney`, `usedExtraChance`, `quizPassed`, `extraChanceAvailable`, `extraChanceUnlocked`.
+- Cap nhat lock flow:
+  - `LOCKED` mode khong lock ngay khi non-money lan 1.
+  - Sai quiz hoac non-money lan 2 moi lock.
+- Cap nhat UI:
+  - Them nut `Thử vận may lần nữa` trong result modal.
+  - Them man extra chance prompt.
+  - Them quiz modal theo style mobile-first.
+
+### Fixed
+- Quiz feedback theo UX moi:
+  - Sai: `😆 Hơi thiếu một chút! Vận may dừng lại ở đây nhé~`
+  - Dung: `🎉 Chính xác! Vũ trụ cho bạn thêm 1 cơ hội!`
+- Tranh dong lock screen ngay lap tuc truoc khi user doc quiz feedback.
+
+## [0.4.2] - 2026-02-16
+
+### Added
+- Them khu `Ket qua gan nhat` ro rang hon tren man lock:
+  - Badge theo loai ket qua.
+  - Highlight gia tri tien neu co.
+  - Luon co loi chuc.
+
+### Changed
+- Loai bo hoan toan `Ma may man` khoi modal/share/fate.
+
+### Fixed
+- Giam thong tin du thua trong modal va lock screen.
+
+## [0.4.1] - 2026-02-16
+
+### Added
+- Them bo flag true/false trong `config.js`:
+  - `FREE_MODE`, `EVENT_MODE`, `TEST_MODE`, `ENABLE_LOCK`.
+- Them duration theo don vi de doc:
+  - `LOCK_DURATION_DAYS`, `EVENT_LOCK_DURATION_HOURS`, `TEST_LOCK_DURATION_SECONDS`.
+
+### Changed
+- `src/core/config.js` ho tro ca kieu cu (`*_MS`) va kieu moi (flags + unit).
+
+### Fixed
+- Don gian hoa thao tac config, tranh sua nham.
+
+## [0.4.0] - 2026-02-16
+
+### Added
+- Them mode system `FREE | LOCKED | EVENT | TEST` qua `config.js`.
+- Them co che lock fate bang localStorage va man hinh locked state.
+- Them `README.md` va `CHANGE4LOG.md`.
+
+### Changed
+- Refactor sang kien truc module (`src/core`, `src/game`, `src/ui`, `src/effects`, `src/utils`).
+- Cap nhat flow `main.js` theo event bus.
+
+### Fixed
+- Chuan hoa lock check o `startSession`, `startRound`, `openEnvelope`.
+- Tu dong xoa fate het han hoac sai mode.

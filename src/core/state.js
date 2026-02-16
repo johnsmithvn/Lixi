@@ -4,7 +4,14 @@
     maxStreak: 0,
     envelopes: [],
     currentResult: null,
-    isBusy: false
+    isBusy: false,
+    played: false,
+    hasMoney: false,
+    usedExtraChance: false,
+    quizPassed: false,
+    extraChanceAvailable: false,
+    extraChanceUnlocked: false,
+    quizAttemptsUsed: 0
 };
 
 export function snapshotState() {
@@ -14,7 +21,14 @@ export function snapshotState() {
         maxStreak: state.maxStreak,
         envelopes: state.envelopes,
         currentResult: state.currentResult,
-        isBusy: state.isBusy
+        isBusy: state.isBusy,
+        played: state.played,
+        hasMoney: state.hasMoney,
+        usedExtraChance: state.usedExtraChance,
+        quizPassed: state.quizPassed,
+        extraChanceAvailable: state.extraChanceAvailable,
+        extraChanceUnlocked: state.extraChanceUnlocked,
+        quizAttemptsUsed: state.quizAttemptsUsed
     };
 }
 
@@ -28,4 +42,11 @@ export function resetRoundState() {
 export function resetSessionState() {
     resetRoundState();
     state.streak = 0;
+    state.played = false;
+    state.hasMoney = false;
+    state.usedExtraChance = false;
+    state.quizPassed = false;
+    state.extraChanceAvailable = false;
+    state.extraChanceUnlocked = false;
+    state.quizAttemptsUsed = 0;
 }

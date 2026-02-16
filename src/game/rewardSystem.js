@@ -1,5 +1,5 @@
 ﻿import { APP_CONFIG } from '../core/config.js';
-import { randomItem, shuffle } from '../utils/random.js';
+import { randomItem } from '../utils/random.js';
 
 const ENVELOPE_FACES = [
     { emoji: '😎', label: 'Bao Ngầu' },
@@ -10,7 +10,10 @@ const ENVELOPE_FACES = [
     { emoji: '😏', label: 'Bao Bí Ẩn' },
     { emoji: '🥺', label: 'Bao Tội Nghiệp' },
     { emoji: '😤', label: 'Bao Giận Dỗi' },
-    { emoji: '🤡', label: 'Bao Hề' }
+    { emoji: '🤡', label: 'Bao Hề' },
+    { emoji: '😋', label: 'Bao Háu Ăn' },
+    { emoji: '🤡', label: 'Bao Khôn Lanh' },
+    { emoji: '👻', label: 'Bao Lầy Lội' }
 ];
 
 const HOVER_QUOTES = [
@@ -19,7 +22,7 @@ const HOVER_QUOTES = [
     'Mở tui ra, không hối hận đâu! 😆',
     'Tui đẹp nhất, chọn tui đi! ✨',
     'Bốc tui đi, tui hứa không troll 🤞',
-    'Psst... tui là jackpot đó! 🤫',
+    'Psst... tui là bao meme dễ thương đó! 🤫',
     'Đừng ngại, cứ bốc tui đi 😉',
     'Tui tuy nhỏ nhưng tiền nhiều 💸',
     'Hôm nay vận may đứng ngay trong tui 😎',
@@ -42,8 +45,9 @@ const JOKE_REWARDS = [
 ];
 
 const TROLL_JACKPOT = {
-    fake: '999.999.999đ',
-    reveal: 'À nhầm 😆\nChúc bạn may mắn lần sau nhé!'
+    title: 'BẠN TRÚNG JACKPOT!!!',
+    text: '999.999.999đ',
+    reveal: '😜 Troll nhẹ thôi nè! Lộc thật đang chạy tới rồi đó.'
 };
 
 const PETAL_SYMBOLS = ['🌸', '🏵️', '✿', '❀', '🌺'];
@@ -57,14 +61,14 @@ export function getHoverQuote() {
 }
 
 export function createEnvelopeSet() {
-    const selectedFaces = shuffle(ENVELOPE_FACES).slice(0, APP_CONFIG.totalEnvelopes);
-    const trollIndex = Math.random() < APP_CONFIG.probabilities.trollChance
-        ? Math.floor(Math.random() * APP_CONFIG.totalEnvelopes)
-        : -1;
+    const selectedFaces = Array.from({ length: APP_CONFIG.totalEnvelopes }, () => randomItem(ENVELOPE_FACES));
+    const trollChance = APP_CONFIG.probabilities.trollChance;
+    const moneyThreshold = trollChance + APP_CONFIG.probabilities.moneyChance;
 
     return selectedFaces.map((face, index) => {
-        const isTroll = index === trollIndex;
-        const isMoney = !isTroll && Math.random() < APP_CONFIG.probabilities.moneyChanceWhenNotTroll;
+        const roll = Math.random();
+        const isTroll = roll < trollChance;
+        const isMoney = !isTroll && roll < moneyThreshold;
 
         return {
             index,
@@ -83,11 +87,11 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
             result: {
                 type: 'troll',
                 icon: '💥',
-                title: 'BẠN TRÚNG JACKPOT!!!',
-                text: TROLL_JACKPOT.fake,
+                title: TROLL_JACKPOT.title,
+                text: TROLL_JACKPOT.text,
                 reveal: TROLL_JACKPOT.reveal,
                 streak: 0,
-                blessing: 'Chúc bạn năm mới vững tâm, lộc to sẽ tới đúng lúc! 🍀',
+                blessing: 'Chúc bạn năm mới cười tươi, lộc thật sẽ tới sau nhé! 🍀',
                 confettiCount: APP_CONFIG.effects.confetti.troll
             }
         };
@@ -103,6 +107,7 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
                 icon: '🧧',
                 title: `Bạn nhận được: ${randomItem(MONEY_REWARDS)}`,
                 text: 'Đầu năm bốc trúng lộc, quá đã luôn! 💸',
+                claimNote: '📸 Chụp ảnh màn hình gửi chủ thớt để lĩnh xèng nha!',
                 streak: nextStreak,
                 blessing: 'Chúc bạn năm mới tài lộc đầy nhà, tiền vô như nước! 🎊',
                 confettiCount: nextStreak >= 3

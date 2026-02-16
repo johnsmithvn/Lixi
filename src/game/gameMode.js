@@ -31,7 +31,8 @@ function parseFate(raw) {
         mode: raw.mode,
         playedAt: Number(raw.playedAt) || Date.now(),
         expireAt,
-        result: raw.result && typeof raw.result === 'object' ? raw.result : null
+        result: raw.result && typeof raw.result === 'object' ? raw.result : null,
+        meta: raw.meta && typeof raw.meta === 'object' ? raw.meta : {}
     };
 }
 
@@ -57,7 +58,7 @@ export function createGameModeManager() {
         return parsed;
     }
 
-    function lockWithResult(result) {
+    function lockWithResult(result, meta = {}) {
         if (!isLockingMode(mode)) {
             return null;
         }
@@ -72,7 +73,8 @@ export function createGameModeManager() {
                 title: result.title,
                 text: result.text,
                 blessing: result.blessing
-            }
+            },
+            meta
         };
 
         writeJSON(storageKey, fate);
