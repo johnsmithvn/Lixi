@@ -1,0 +1,8 @@
+﻿window.APP_CONFIG = {
+    MODE: 'LOCKED',
+    LOCK_DURATION_MS: 365 * 24 * 60 * 60 * 1000,
+    EVENT_LOCK_DURATION_MS: 24 * 60 * 60 * 1000,
+    TEST_LOCK_DURATION_MS: 60 * 1000,
+    ALLOW_QUERY_OVERRIDE: true,
+    FATE_STORAGE_KEY: 'lixi_fate_2026'
+};

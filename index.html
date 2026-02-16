@@ -3,59 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧧 Bao Lì Xì Biết Nói</title>
+    <title>Máy Lì Xì PRO++</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ===== PETAL CONTAINER ===== -->
-    <div id="petals-container"></div>
+    <div id="scene-root">
+        <div id="petals-container" aria-hidden="true"></div>
 
-    <!-- ===== WELCOME SCREEN ===== -->
-    <div id="welcome-screen" class="screen active">
-        <div class="welcome-content">
-            <div class="lantern lantern-left">🏮</div>
-            <div class="lantern lantern-right">🏮</div>
-            <div class="welcome-emoji">🧧</div>
-            <h1>Chào mừng tới<br><span class="highlight">Máy Lì Xì Cute</span></h1>
-            <p class="subtitle">Bao lì xì biết nói — bốc thử xem bao nào chọn bạn! 🌸</p>
-            <button id="start-btn" class="btn-start" onclick="startGame()">
-                <span>🎉 Bắt đầu bốc 🎉</span>
-            </button>
-        </div>
+        <section id="welcome-screen" class="screen active">
+            <div class="welcome-content">
+                <div class="lantern lantern-left">🏮</div>
+                <div class="lantern lantern-right">🏮</div>
+                <div class="welcome-emoji">🧧</div>
+                <h1>Chào mừng tới<br><span class="highlight">Máy Lì Xì PRO++</span></h1>
+                <p class="subtitle">Bốc thử một bao để xem vận may hôm nay gọi tên ai.</p>
+                <button id="start-btn" class="btn-start" type="button">
+                    🎉 Bắt đầu bốc 🎉
+                </button>
+            </div>
+        </section>
+
+        <section id="game-screen" class="screen">
+            <h2 class="game-title">Chọn một bao lì xì nào! 🧧</h2>
+            <p class="game-subtitle">Hover để nghe bao nói, click để mở!</p>
+
+            <div class="game-hud">
+                <p id="opened-counter">Đã mở: 0/6</p>
+                <p id="streak-counter">🔥 Chuỗi may mắn: x0</p>
+            </div>
+
+            <div id="envelope-grid" class="envelope-grid"></div>
+
+            <div id="envelope-speech" class="speech-bubble hidden">
+                <span id="speech-text"></span>
+            </div>
+        </section>
     </div>
 
-    <!-- ===== GAME SCREEN ===== -->
-    <div id="game-screen" class="screen">
-        <h2 class="game-title">Chọn một bao lì xì nào! 🧧</h2>
-        <p class="game-subtitle">Hover để nghe bao nói, click để mở!</p>
-        <div id="envelope-grid" class="envelope-grid">
-            <!-- Envelopes injected by JS -->
-        </div>
-        <div id="envelope-speech" class="speech-bubble hidden">
-            <span id="speech-text"></span>
-        </div>
-    </div>
-
-    <!-- ===== RESULT MODAL ===== -->
-    <div id="result-modal" class="modal hidden">
-        <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="result-main">
+        <div class="modal-backdrop" data-close-modal="true"></div>
         <div class="modal-content">
             <div id="result-icon" class="result-icon"></div>
             <div id="result-main" class="result-main"></div>
             <div id="result-sub" class="result-sub"></div>
-            <!-- Troll jackpot fake -->
+            <div id="result-streak" class="result-streak"></div>
+            <div id="result-lucky-code" class="result-lucky-code"></div>
             <div id="troll-reveal" class="troll-reveal hidden"></div>
-            <button class="btn-again" onclick="playAgain()">🔄 Bốc lại nào!</button>
-            <button class="btn-share" onclick="shareResult()">📤 Gửi cho bạn bè troll</button>
+
+            <div class="modal-actions">
+                <button id="play-again-btn" class="btn-again" type="button">🔄 Bốc lại nào!</button>
+                <button id="share-btn" class="btn-share" type="button">📤 Gửi cho bạn bè troll</button>
+            </div>
         </div>
     </div>
 
-    <!-- ===== CONFETTI CANVAS ===== -->
     <canvas id="confetti-canvas"></canvas>
 
-    <script src="confetti.js"></script>
-    <script src="app.js"></script>
+    <audio id="click-sfx" preload="auto"></audio>
+    <audio id="win-sfx" preload="auto"></audio>
+    <audio id="troll-sfx" preload="auto"></audio>
+
+    <script src="config.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
