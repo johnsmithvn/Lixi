@@ -11,7 +11,8 @@
     quizPassed: false,
     extraChanceAvailable: false,
     extraChanceUnlocked: false,
-    quizAttemptsUsed: 0
+    quizAttemptsUsed: 0,
+    missAttemptsUsed: 0
 };
 
 export function snapshotState() {
@@ -28,7 +29,8 @@ export function snapshotState() {
         quizPassed: state.quizPassed,
         extraChanceAvailable: state.extraChanceAvailable,
         extraChanceUnlocked: state.extraChanceUnlocked,
-        quizAttemptsUsed: state.quizAttemptsUsed
+        quizAttemptsUsed: state.quizAttemptsUsed,
+        missAttemptsUsed: state.missAttemptsUsed
     };
 }
 
@@ -49,4 +51,5 @@ export function resetSessionState() {
     state.extraChanceAvailable = false;
     state.extraChanceUnlocked = false;
     state.quizAttemptsUsed = 0;
+    state.missAttemptsUsed = 0;
 }

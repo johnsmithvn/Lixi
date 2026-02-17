@@ -10,18 +10,18 @@
 
     // ===== OPEN GATE (THOI GIAN MO CUA WEB) =====
     OPEN_GATE: {
-        enabled: false,
+        enabled: true,
         // Vi du: '2026-02-20T20:00:00+07:00'
-        at: '2026-02-16T17:00:00+07:00',
+        at: '2026-02-17T17:00:00+07:00',
         // Cho phep choi quiz trong luc cho mo cua
         allowQuiz: true
     },
 
     // ===== QUIZ =====
     QUIZ: {
-        // So lan tra loi mini-quiz toi da trong 1 session lock.
-        // Dat = 0 de khoa mini-quiz.
-        maxAttempts: 30,
+        // Neu winContinueMode = false: so lan tra loi mini-quiz toi da.
+        // Neu winContinueMode = true: so luot xit toi da truoc khi bi khoa.
+        maxAttempts: 20,
         // LOCKED mode co cho mini-quiz de mo them co hoi hay khong.
         enabledInLockedMode: true,
         // true: Trung money/special se duoc mo tiep ngay, khong can quiz.
@@ -34,7 +34,7 @@
 
     // ===== GAME BALANCE =====
     GAME: {
-        totalEnvelopes: 30,
+        totalEnvelopes: 20,
         // 'CHANCE' = theo ti le % ; 'COUNT' = theo so luong
         rewardMode: 'COUNT',
 

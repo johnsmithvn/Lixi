@@ -1,4 +1,4 @@
-﻿# CHANGE4LOG
+﻿# CHANGELOG
 
 Tai lieu theo doi version va lich su thay doi.
 
@@ -17,9 +17,35 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.8.7`
+**Current:** `0.9.0`
 
 ## 4. Lich su thay doi
+
+## [0.9.0] - 2026-02-17
+
+### Added
+- Them config `QUIZ.winContinueMode`:
+  - Khi `true`, trung `money/special` se duoc mo tiep ngay, bo qua quiz.
+  - Ket qua trung truoc do duoc giu khi fail o luot mo tiep theo.
+- Them footer countdown o man lock:
+  - `Co the mo lai tu: ...`
+  - `Con khoang ... giay/phut/gio/ngay de mo lai`
+- Open flow warning step co fallback image moi:
+  - `/assets/images/yamero.jpg` khi khong config `OPEN_FLOW.finalFaceImage`.
+
+### Changed
+- Cap nhat lock flow theo mode moi:
+  - Tranh lock ngay lap tuc trong luong win-continue truoc khi user het luot mo.
+  - `QUIZ.maxAttempts` trong win-continue duoc hieu la so luot xit toi da truoc khi khoa.
+- UI lock/extra chance duoc tinh chinh:
+  - doi thu tu thong diep claim note nam duoi loi chuc.
+  - cap nhat noi dung highlight loi chuc theo tung loai ket qua.
+- Modal ket qua ho tro scroll noi dung cho man hinh nho.
+- Them/tinh chinh nhieu style highlight cho `special`, `money`, `joke` de de doc hon.
+
+### Fixed
+- Sua nham lan tai lieu giua `CHANGE4LOG` va `CHANGELOG`.
+- Dong bo noi dung docs voi config va behavior hien tai (quiz kinds, open gate, win-continue mode, assets image).
 
 ## [0.8.7] - 2026-02-16
 
@@ -362,3 +388,4 @@ Tai lieu theo doi version va lich su thay doi.
 ### Fixed
 - Chuan hoa lock check o `startSession`, `startRound`, `openEnvelope`.
 - Tu dong xoa fate het han hoac sai mode.
+

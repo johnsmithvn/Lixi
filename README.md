@@ -1,83 +1,52 @@
-﻿# Lixi PRO++ (Web Li Xi)
+# Lixi PRO++ (Web Li Xi)
 
-Web mini-game li xi theo huong mobile-first, module architecture, va mode lock linh hoat.
+Web mini-game li xi theo huong mobile-first, khong can backend, chay duoc tren static hosting.
 
 ## 1. Tong quan
 
 - Tech: HTML + CSS + JavaScript ES Modules.
-- Khong can backend.
-- Chay tren static hosting (Vercel, Netlify, GitHub Pages) hoac local static server.
+- Kien truc module: `src/core`, `src/game`, `src/ui`, `src/effects`, `src/utils`.
+- Co lock mode theo localStorage + event bus de tach luong UI/game.
 
 ## 2. Tinh nang hien tai
 
-- Mo bao li xi voi animation reveal + confetti + vibration + sound.
-- Reward gom 3 nhom:
+- Mo bao li xi voi reveal animation + confetti + vibration + sound.
+- Reward type:
   - `money`
+  - `special`
   - `troll`
   - `joke`
-- Streak system + best streak luu localStorage.
-- Mode system:
-  - `FREE`
-  - `LOCKED`
-  - `EVENT`
-  - `TEST`
-- Open gate theo gio:
-  - Neu chua den gio mo cua -> hien man hinh dem nguoc.
-  - Co the bat quiz trong luc cho mo cua.
-- LOCKED mode co `Quiz Extra Chance`:
-  - Neu lan dau mo ra `troll`/`joke`, user duoc quiz 1 cau.
-  - Dung: them 1 luot mo bao.
-  - Sai: khoa luot.
-- Khi da bi lock van co the `Choi quiz cho vui` (khong mo khoa, khong tinh luot).
-- Quiz chi ho tro `text` va `image` (khong ho tro video).
+- Open flow truoc khi mo bao (`QUICK` / `DRAMA`), co buoc warning.
+- Open gate theo gio (`OPEN_GATE`) voi man hinh dem nguoc.
+- Quiz he thong:
+  - `choice`
+  - `word`
+  - `stroop` (dynamic)
+  - `reaction` (dynamic)
+- Locked state:
+  - co man hinh ket qua gan nhat
+  - co footer dem nguoc `Co the mo lai tu...` + `Con khoang...`
+- Modal ket qua da ho tro:
+  - noi dung dai co the scroll tren mobile
+  - highlight loi chuc theo tung loai ket qua
 
-## 3. UX quiz (theo y tuong moi)
+## 3. Mode game va lock behavior
 
-- Moi lan chi hien thi 1 cau hoi.
-- Copy feedback:
-  - Dung: `🎉 Chinh xac! Vu tru cho ban them 1 co hoi!`
-  - Sai: `😆 Hoi thieu mot chut! Van may dung lai o day nhe~`
-- Neu sai, khong show text "Sai" theo kieu tieu cuc.
+Mode ho tro:
 
-## 4. Cau truc thu muc
+- `FREE`
+- `LOCKED`
+- `EVENT`
+- `TEST`
 
-```text
-.
-|-- assets
-|   `-- images
-|       `-- banhchung.svg
-|-- config.js
-|-- index.html
-|-- main.js
-|-- style.css
-`-- src
-    |-- core
-    |   |-- config.js
-    |   |-- eventBus.js
-    |   `-- state.js
-    |-- effects
-    |   |-- confetti.js
-    |   |-- sound.js
-    |   `-- vibration.js
-    |-- game
-    |   |-- gameEngine.js
-    |   |-- gameMode.js
-    |   |-- quizData.js
-    |   |-- quizEngine.js
-    |   `-- rewardSystem.js
-    |-- ui
-    |   |-- envelope.js
-    |   |-- modal.js
-    |   |-- quizModal.js
-    |   `-- renderer.js
-    `-- utils
-        |-- random.js
-        `-- storage.js
-```
+Thu tu resolve mode:
 
-## 5. Config de sua nhanh (true/false)
+1. Query `?mode=` (neu `MODE_OPTIONS.allowQueryOverride = true`)
+2. Legacy flags (`FREE_MODE`, `EVENT_MODE`, `TEST_MODE`, `ENABLE_LOCK`)
+3. `MODE`
+4. Mac dinh `LOCKED`
 
-File: `config.js`
+## 4. Config nhanh (config.js)
 
 ```js
 window.APP_CONFIG = {
@@ -93,22 +62,35 @@ window.APP_CONFIG = {
   },
 
   QUIZ: {
-    enabledInLockedMode: true,
+    // Neu winContinueMode = false: so lan quiz toi da
+    // Neu winContinueMode = true: so luot xit toi da truoc khi khoa
     maxAttempts: 3,
+    enabledInLockedMode: true,
+
+    // true: trung money/special thi duoc mo tiep ngay, bo qua quiz
+    // maxAttempts luc nay duoc tinh la so luot xit toi da truoc khi khoa
+    winContinueMode: false,
+
     uniquePerDevice: true
   },
 
   GAME: {
     totalEnvelopes: 10,
-    rewardMode: 'CHANCE',
+    rewardMode: 'CHANCE', // 'CHANCE' | 'COUNT'
 
+    // CHANCE mode
     trollChance: 0.2,
     specialChance: 0.05,
     moneyChance: 0.4,
 
+    // COUNT mode
     trollCount: 2,
     specialCount: 1,
     moneyCount: 4
+  },
+
+  TIMINGS: {
+    trollRevealDelayMs: 1200
   },
 
   DURATION: {
@@ -124,100 +106,34 @@ window.APP_CONFIG = {
 };
 ```
 
-Y nghia nhanh:
+Luu y quan trong:
 
-- `MODE` -> chon che do game (`FREE` | `LOCKED` | `EVENT` | `TEST`).
-- `MODE_OPTIONS.allowQueryOverride` -> cho phep override nhanh bang query `?mode=...`.
-- `OPEN_GATE` -> bat/tat mo cua theo gio.
-- `QUIZ` -> cau hinh mini-quiz extra chance.
-- `GAME` -> so bao + kieu chia reward.
-- `GAME.rewardMode: 'CHANCE'` -> dung `trollChance`, `specialChance`, `moneyChance`.
-- `GAME.rewardMode: 'COUNT'` -> dung `trollCount`, `specialCount`, `moneyCount`.
-- Neu tong count vuot `totalEnvelopes`, he thong uu tien giu: `special` -> `money` -> `troll`.
-- `DURATION` -> thoi gian lock cho tung mode.
-- `STORAGE` -> key localStorage.
+- `GAME.rewardMode = 'COUNT'`: neu tong count vuot `totalEnvelopes`, he thong uu tien `special -> money -> troll`.
+- `QUIZ.winContinueMode = false`: `maxAttempts` la quota quiz.
+- `QUIZ.winContinueMode = true`: `maxAttempts` la so luot xit toi da truoc khi khoa.
+- Khi `winContinueMode = true`, ket qua trung dau tien duoc giu (khong bi doi bang ket qua mo sau).
 
-Mac dinh da de san trong code cho cac thong so ky thuat nhu confetti dac biet, sound source va open-flow face image. Chi can khai bao lai khi ban muon custom nang cao.
+## 5. Quiz data
 
-Luu y: key kieu cu (flat config) van duoc ho tro de tuong thich nguoc.
+Sua file: `src/game/quizData.js`.
 
-## 6. Thu tu uu tien mode
+- `choice`: cau hoi text/image.
+- `word`: sap xep chu.
+- `stroop`: tao cau hoi dynamic tu `STROOP_DYNAMIC_CONFIG`.
+- `reaction`: tao cau hoi dynamic tu `REACTION_DYNAMIC_CONFIG`.
 
-He thong resolve mode theo thu tu:
+Media quiz image hien tai nam trong:
 
-1. Query `?mode=` (neu `MODE_OPTIONS.allowQueryOverride = true`)
-2. Boolean flags (chi de tuong thich nguoc): `FREE_MODE`, `EVENT_MODE`, `TEST_MODE`, `ENABLE_LOCK`
-3. `MODE`
-4. Mac dinh `LOCKED`
+- `assets/images/banhchung.png`
+- `assets/images/daudau.png`
+- `assets/images/dautim.jpg`
+- `assets/images/hoc.jpg`
+- `assets/images/leuleu.jpg`
+- `assets/images/suynghi.jpg`
+- `assets/images/uwu.jpg`
+- `assets/images/yamero.jpg`
 
-Gia tri query hop le:
-
-- `?mode=free`
-- `?mode=locked`
-- `?mode=event`
-- `?mode=test`
-
-## 7. LocalStorage keys
-
-- `lixi_best_streak_v1`: best streak.
-- `lixi_fate_2026` (hoac key custom): lock state theo mode.
-
-## 8. Them cau hoi quiz moi
-
-Sua file: `src/game/quizData.js`
-
-Mau `text`:
-
-```js
-{
-  id: 'q_text_1',
-  type: 'text',
-  question: 'Tet thuong co may ngay nghi chinh thuc?',
-  media: null,
-  answers: [
-    { text: '1 ngay', correct: false },
-    { text: '3 ngay', correct: true },
-    { text: '7 ngay', correct: false }
-  ]
-}
-```
-
-Mau `image`:
-
-```js
-{
-  id: 'q_image_1',
-  type: 'image',
-  question: 'Trong hinh la mon gi ngay Tet?',
-  media: '/assets/images/banhchung.svg',
-  answers: [
-    { text: 'Banh chung', correct: true },
-    { text: 'Pizza', correct: false }
-  ]
-}
-```
-
-Mau `word` (co the truyen chu da xao san):
-
-```js
-{
-  id: 'w_custom_1',
-  question: 'Giai ma tu khoa Tet sau',
-  hint: 'Mon banh truyen thong goi la dong',
-  answer: 'BANH CHUNG',
-  // Neu co field nay thi se dung luon, khong random nua
-  presetScrambled: 'CHUN GHBAN'
-}
-```
-
-Luu y:
-
-- Khong dung `type: 'video'`.
-- Moi cau can it nhat 2 dap an.
-- Moi cau nen co dung 1 dap an `correct: true`.
-- Word puzzle co ho tro alias `scrambled`, nhung nen dung `presetScrambled` de ro nghia.
-
-## 9. Chay local
+## 6. Run local
 
 ```powershell
 # Option 1
@@ -229,7 +145,7 @@ npx serve .
 
 Mo `http://localhost:8080`.
 
-## 10. Versioning
+## 7. Tai lieu version
 
+- Changelog: `CHANGELOG.md`
 - Dung Semantic Versioning.
-- Moi thay doi can cap nhat `CHANGE4LOG.md`.
