@@ -47,7 +47,15 @@ export function createGameEngine(eventBus = defaultEventBus) {
         return gameMode.mode === GAME_MODES.EVENT || gameMode.mode === GAME_MODES.TEST;
     }
 
+    function isWinContinueModeEnabled() {
+        return isLockedMode() && APP_CONFIG.quiz.winContinueMode === true;
+    }
+
     function isExtraQuizEnabled() {
+        if (isWinContinueModeEnabled()) {
+            return false;
+        }
+
         return APP_CONFIG.quiz.enabledInLockedMode === true;
     }
 
@@ -130,9 +138,19 @@ export function createGameEngine(eventBus = defaultEventBus) {
 
     function openEnvelope(index) {
         const activeFate = gameMode.getActiveFate();
-        const isOverwritingLockedFate = Boolean(activeFate && state.extraChanceUnlocked);
+        const winContinueModeEnabled = isWinContinueModeEnabled();
+        const isOverwritingLockedFate = Boolean(
+            activeFate
+            && state.extraChanceUnlocked
+            && !winContinueModeEnabled
+        );
+        const isContinuingFromLockedWin = Boolean(
+            activeFate
+            && state.extraChanceUnlocked
+            && winContinueModeEnabled
+        );
 
-        if (activeFate && !isOverwritingLockedFate) {
+        if (activeFate && !isOverwritingLockedFate && !isContinuingFromLockedWin) {
             emitLockedSession(activeFate);
             return null;
         }
@@ -184,22 +202,36 @@ export function createGameEngine(eventBus = defaultEventBus) {
             const canContinueQuiz = isExtraQuizEnabled() && hasRemainingQuizAttempts();
 
             if (state.hasMoney) {
-                shouldLock = true;
-                if (canContinueQuiz) {
-                    lockReason = isSpecialWin
-                        ? (usingExtraTurn ? 'special_reroll_win' : 'special_win')
-                        : (usingExtraTurn ? 'reroll_win' : 'first_win');
-                    state.extraChanceAvailable = true;
-                    eventBus.emit('session:extra-chance-offered', {
-                        mode: gameMode.mode,
-                        result: state.currentResult
-                    });
-                } else {
-                    lockReason = isSpecialWin
-                        ? (usingExtraTurn ? 'special_second_win' : 'special_win')
-                        : (usingExtraTurn ? 'second_win' : 'first_win');
+                if (winContinueModeEnabled) {
+                    lockReason = isSpecialWin ? 'special_win_continue' : 'money_win_continue';
+                    lockSessionWithResult(state.currentResult, lockReason);
+
+                    const hasMoreEnvelopes = state.openedCount < APP_CONFIG.totalEnvelopes;
+                    state.extraChanceUnlocked = hasMoreEnvelopes;
                     state.extraChanceAvailable = false;
+                    shouldLock = false;
+                } else {
+                    shouldLock = true;
+                    if (canContinueQuiz) {
+                        lockReason = isSpecialWin
+                            ? (usingExtraTurn ? 'special_reroll_win' : 'special_win')
+                            : (usingExtraTurn ? 'reroll_win' : 'first_win');
+                        state.extraChanceAvailable = true;
+                        eventBus.emit('session:extra-chance-offered', {
+                            mode: gameMode.mode,
+                            result: state.currentResult
+                        });
+                    } else {
+                        lockReason = isSpecialWin
+                            ? (usingExtraTurn ? 'special_second_win' : 'special_win')
+                            : (usingExtraTurn ? 'second_win' : 'first_win');
+                        state.extraChanceAvailable = false;
+                    }
                 }
+            } else if (winContinueModeEnabled && usingExtraTurn && activeFate) {
+                // Lose after a granted continue turn keeps the previous winning fate.
+                shouldLock = false;
+                state.extraChanceAvailable = false;
             } else if (canContinueQuiz) {
                 shouldLock = !firstOpen;
                 lockReason = usingExtraTurn ? 'reroll_continue' : 'first_miss';
@@ -369,6 +401,19 @@ export function createGameEngine(eventBus = defaultEventBus) {
         return state.envelopes[idx] ?? null;
     }
 
+    function getVisibleActiveFate() {
+        const activeFate = gameMode.getActiveFate();
+        if (!activeFate) {
+            return null;
+        }
+
+        if (isWinContinueModeEnabled() && state.extraChanceUnlocked) {
+            return null;
+        }
+
+        return activeFate;
+    }
+
     return {
         startSession,
         startRound,
@@ -385,7 +430,7 @@ export function createGameEngine(eventBus = defaultEventBus) {
         getState: snapshotState,
         getEnvelopePreview,
         getGameMode: () => gameMode.mode,
-        getActiveFate: () => gameMode.getActiveFate(),
+        getActiveFate: getVisibleActiveFate,
         hasUnlockedExtraChance: () => state.extraChanceUnlocked,
         getQuizStatus,
         isSessionLocked: () => gameMode.isLocked()

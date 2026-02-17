@@ -1,3 +1,23 @@
+import { QUIZ_KINDS } from '../game/quizData.js';
+
+const STROOP_COLORS = Object.freeze({
+    red: '#d7322d',
+    blue: '#1f6feb',
+    yellow: '#cf8a00',
+    purple: '#7a3cb9',
+    orange: '#d95b16',
+    pink: '#e75480',
+    brown: '#8b5a2b'
+});
+
+function resolveStroopColor(colorToken) {
+    if (typeof colorToken !== 'string') {
+        return '#6d2f27';
+    }
+
+    return STROOP_COLORS[colorToken] ?? '#6d2f27';
+}
+
 function buildStepLabel(baseText, quizStatus) {
     if (!quizStatus || typeof quizStatus !== 'object') {
         return baseText;
@@ -13,6 +33,8 @@ export function createQuizModalController() {
     const refs = {};
     let handlers = null;
     let wordState = null;
+    let stroopState = null;
+    let reactionState = null;
 
     function cacheRefs() {
         refs.modal = document.getElementById('quiz-modal');
@@ -51,8 +73,55 @@ export function createQuizModalController() {
         refs.mediaContainer.classList.add('hidden');
     }
 
+    function formatCountdownMs(rawMs) {
+        const ms = Math.max(0, Number(rawMs) || 0);
+        return `${(ms / 1000).toFixed(1)}s`;
+    }
+
+    function clearStroopState() {
+        if (stroopState?.countdownIntervalId) {
+            clearInterval(stroopState.countdownIntervalId);
+        }
+
+        if (stroopState?.timeoutId) {
+            clearTimeout(stroopState.timeoutId);
+        }
+
+        stroopState = null;
+    }
+
+    function stopReactionTimers(state) {
+        if (!state) {
+            return;
+        }
+
+        if (state.readyTimerId) {
+            clearTimeout(state.readyTimerId);
+        }
+
+        if (state.readyCountdownIntervalId) {
+            clearInterval(state.readyCountdownIntervalId);
+        }
+
+        if (state.responseWindowTimerId) {
+            clearTimeout(state.responseWindowTimerId);
+        }
+
+        if (state.responseCountdownIntervalId) {
+            clearInterval(state.responseCountdownIntervalId);
+        }
+    }
+
+    function clearReactionState() {
+        stopReactionTimers(reactionState);
+        reactionState = null;
+    }
+
     function clearAnswers() {
+        clearStroopState();
+        clearReactionState();
         refs.answers.innerHTML = '';
+        refs.answers.classList.remove('quiz-answers--stroop', 'quiz-answers--reaction');
         refs.answers.classList.add('hidden');
     }
 
@@ -83,7 +152,7 @@ export function createQuizModalController() {
     function renderMedia(question) {
         clearMedia();
 
-        if (question.type === 'image' && question.media) {
+        if (typeof question?.media === 'string' && question.media.trim().length > 0) {
             const image = document.createElement('img');
             image.className = 'quiz-media-image';
             image.src = question.media;
@@ -97,18 +166,192 @@ export function createQuizModalController() {
         clearAnswers();
         refs.answers.classList.remove('hidden');
 
+        const isStroop = question.quizKind === QUIZ_KINDS.STROOP;
+        refs.answers.classList.toggle('quiz-answers--stroop', isStroop);
+
+        const answerButtons = [];
+        const stroopTimer = isStroop ? document.createElement('p') : null;
+        if (stroopTimer) {
+            stroopTimer.className = 'quiz-timer';
+            refs.answers.appendChild(stroopTimer);
+        }
+
         question.answers.forEach((answer, index) => {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'quiz-answer-btn';
+            if (isStroop) {
+                button.classList.add('quiz-answer-btn--stroop');
+                button.style.color = resolveStroopColor(answer.colorToken);
+            }
             button.dataset.answerIndex = String(index);
             button.textContent = answer.text;
             button.addEventListener('click', () => {
+                if (isStroop) {
+                    if (!stroopState || stroopState.locked) {
+                        return;
+                    }
+
+                    stroopState.locked = true;
+                    clearInterval(stroopState.countdownIntervalId);
+                    clearTimeout(stroopState.timeoutId);
+                }
+
                 handlers?.onAnswer({ answerIndex: index });
             });
 
+            answerButtons.push(button);
             refs.answers.appendChild(button);
         });
+
+        if (!isStroop || !stroopTimer) {
+            return;
+        }
+
+        const answerTimeMs = Number.isFinite(Number(question.answerTimeMs))
+            ? Math.max(1000, Math.round(Number(question.answerTimeMs)))
+            : 4500;
+        const startedAtMs = performance.now();
+
+        stroopState = {
+            locked: false,
+            countdownIntervalId: 0,
+            timeoutId: 0
+        };
+
+        const updateCountdown = () => {
+            if (!stroopState || stroopState.locked) {
+                return;
+            }
+
+            const leftMs = Math.max(0, answerTimeMs - (performance.now() - startedAtMs));
+            stroopTimer.textContent = `⏳ Còn ${formatCountdownMs(leftMs)}`;
+            stroopTimer.classList.toggle('danger', leftMs <= 1400);
+        };
+
+        updateCountdown();
+        stroopState.countdownIntervalId = window.setInterval(updateCountdown, 80);
+        stroopState.timeoutId = window.setTimeout(() => {
+            if (!stroopState || stroopState.locked) {
+                return;
+            }
+
+            stroopState.locked = true;
+            clearInterval(stroopState.countdownIntervalId);
+
+            answerButtons.forEach((button) => {
+                button.setAttribute('disabled', 'disabled');
+            });
+
+            stroopTimer.textContent = '⏰ Hết giờ!';
+            stroopTimer.classList.add('danger');
+
+            handlers?.onAnswer({
+                timing: 'timeout',
+                answerTimeMs
+            });
+        }, answerTimeMs);
+    }
+
+    function renderReactionChallenge(question) {
+        clearAnswers();
+        clearWordForm();
+
+        refs.answers.classList.remove('hidden');
+        refs.answers.classList.add('quiz-answers--reaction');
+
+        const status = document.createElement('p');
+        status.className = 'quiz-reaction-status';
+        status.textContent = 'Cho tin hieu... bam som la truot. Khi hien "BAM NGAY!" ban chi co 0.5s.';
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'quiz-answer-btn quiz-reaction-btn';
+        button.textContent = question.buttonLabel ?? 'BAM NGAY!';
+        button.addEventListener('click', () => {
+            if (!reactionState || reactionState.locked) {
+                return;
+            }
+
+            const now = performance.now();
+            reactionState.locked = true;
+            stopReactionTimers(reactionState);
+
+            if (reactionState.ready !== true) {
+                button.setAttribute('disabled', 'disabled');
+                handlers?.onAnswer({
+                    timing: 'early',
+                    elapsedMs: Math.max(0, Math.round(now - reactionState.startedAtMs)),
+                    readyDelayMs: reactionState.readyDelayMs,
+                    responseWindowMs: reactionState.responseWindowMs
+                });
+                return;
+            }
+
+            const reactionMs = Math.max(0, Math.round(now - reactionState.readyAtMs));
+            const isLate = reactionMs > reactionState.responseWindowMs;
+
+            button.setAttribute('disabled', 'disabled');
+            handlers?.onAnswer({
+                timing: isLate ? 'late' : 'ready',
+                reactionMs,
+                readyDelayMs: reactionState.readyDelayMs,
+                responseWindowMs: reactionState.responseWindowMs
+            });
+        });
+
+        refs.answers.appendChild(status);
+        refs.answers.appendChild(button);
+
+        const delayMs = Number.isFinite(Number(question.readyDelayMs))
+            ? Math.max(300, Math.round(Number(question.readyDelayMs)))
+            : 1500;
+        const responseWindowMs = Number.isFinite(Number(question.responseWindowMs))
+            ? Math.max(100, Math.round(Number(question.responseWindowMs)))
+            : 500;
+
+        reactionState = {
+            startedAtMs: performance.now(),
+            readyAtMs: 0,
+            readyDelayMs: delayMs,
+            responseWindowMs,
+            ready: false,
+            locked: false,
+            readyTimerId: 0,
+            responseWindowTimerId: 0
+        };
+
+        reactionState.readyTimerId = window.setTimeout(() => {
+            if (!reactionState || reactionState.locked) {
+                return;
+            }
+
+            reactionState.ready = true;
+            reactionState.readyAtMs = performance.now();
+            status.textContent = 'BAM NGAY!';
+            status.classList.add('ready');
+            button.classList.add('ready');
+
+            reactionState.responseWindowTimerId = window.setTimeout(() => {
+                if (!reactionState || reactionState.locked) {
+                    return;
+                }
+
+                reactionState.locked = true;
+                stopReactionTimers(reactionState);
+                button.setAttribute('disabled', 'disabled');
+                status.textContent = 'Tre roi! Qua 0.5s.';
+                status.classList.remove('ready');
+                status.classList.add('late');
+
+                handlers?.onAnswer({
+                    timing: 'late',
+                    reactionMs: Math.max(0, Math.round(performance.now() - reactionState.readyAtMs)),
+                    readyDelayMs: reactionState.readyDelayMs,
+                    responseWindowMs: reactionState.responseWindowMs
+                });
+            }, reactionState.responseWindowMs);
+        }, delayMs);
     }
 
     function resetAnswerResultStyles() {
@@ -122,7 +365,7 @@ export function createQuizModalController() {
     }
 
     function revealChoiceResult(feedback) {
-        if (feedback?.quizKind !== 'choice') {
+        if (feedback?.quizKind !== QUIZ_KINDS.CHOICE && feedback?.quizKind !== QUIZ_KINDS.STROOP) {
             return;
         }
 
@@ -299,6 +542,17 @@ export function createQuizModalController() {
             button.setAttribute('disabled', 'disabled');
         });
 
+        if (stroopState) {
+            stroopState.locked = true;
+            clearInterval(stroopState.countdownIntervalId);
+            clearTimeout(stroopState.timeoutId);
+        }
+
+        if (reactionState) {
+            reactionState.locked = true;
+            stopReactionTimers(reactionState);
+        }
+
         if (wordState) {
             wordState.locked = true;
             refreshWordPuzzleUI();
@@ -344,15 +598,22 @@ export function createQuizModalController() {
         clearFeedback();
         clearKindPicker();
 
-        const baseLabel = question.quizKind === 'word'
+        const stepLabel = question.quizKind === QUIZ_KINDS.WORD
             ? '🔤 Xếp chữ Tết'
-            : '🧠 Trắc nghiệm';
+            : question.quizKind === QUIZ_KINDS.STROOP
+                ? '🎯 Ai nhanh hơn'
+                : question.quizKind === QUIZ_KINDS.REACTION
+                    ? '⚡ Phản xạ nhanh'
+                    : '🧠 Trắc nghiệm';
 
-        refs.stepLabel.textContent = buildStepLabel(baseLabel, quizStatus);
+        refs.stepLabel.textContent = buildStepLabel(stepLabel, quizStatus);
         refs.question.textContent = question.question;
 
-        if (question.quizKind === 'word') {
+        if (question.quizKind === QUIZ_KINDS.WORD) {
             renderWordPuzzle(question);
+        } else if (question.quizKind === QUIZ_KINDS.REACTION) {
+            renderMedia(question);
+            renderReactionChallenge(question);
         } else {
             clearWordForm();
             renderMedia(question);
@@ -413,7 +674,7 @@ export function createQuizModalController() {
         if (typeof feedback.continueLabel === 'string' && feedback.continueLabel.trim()) {
             refs.continueBtn.textContent = feedback.continueLabel;
         } else if (feedback.correct) {
-            refs.continueBtn.textContent = '🧧 Mở bao tiếp';
+            refs.continueBtn.textContent = '(„• ֊ •„)੭ Mở bao tiếp';
         } else if (feedback.canRetryQuiz) {
             refs.continueBtn.textContent = `🎯 Thử câu khác (${feedback.remainingAttempts} lượt)`;
         } else {

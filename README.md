@@ -81,67 +81,72 @@ File: `config.js`
 
 ```js
 window.APP_CONFIG = {
-  FREE_MODE: false,
-  EVENT_MODE: false,
-  TEST_MODE: false,
-  ENABLE_LOCK: true,
-
   MODE: 'LOCKED',
-  ALLOW_QUERY_OVERRIDE: true,
-  ENABLE_EXTRA_CHANCE_QUIZ: true,
-  QUIZ_MAX_ATTEMPTS: 3,
-  QUIZ_UNIQUE_PER_DEVICE: true,
-  QUIZ_SEEN_STORAGE_KEY: 'lixi_quiz_seen_v1',
+  MODE_OPTIONS: {
+    allowQueryOverride: true
+  },
 
-  OPEN_GATE_ENABLED: false,
-  OPEN_GATE_AT: '2026-02-20T20:00:00+07:00',
-  OPEN_GATE_ALLOW_QUIZ: true,
+  OPEN_GATE: {
+    enabled: false,
+    at: '2026-02-20T20:00:00+07:00',
+    allowQuiz: true
+  },
 
-  TOTAL_ENVELOPES: 10,
-  TROLL_CHANCE: 0.2,
-  SPECIAL_CHANCE: 0.05,
-  MONEY_CHANCE: 0.4,
-  SPECIAL_CONFETTI_COUNT: 420,
+  QUIZ: {
+    enabledInLockedMode: true,
+    maxAttempts: 3,
+    uniquePerDevice: true
+  },
 
-  SOUND_CLICK_SRC: '/assets/audio/click.mp3',
-  SOUND_WIN_SRC: '/assets/audio/win.mp3',
-  SOUND_TROLL_SRC: '/assets/audio/troll.mp3',
-  SOUND_SPECIAL_SRC: '/assets/audio/special.mp3',
+  GAME: {
+    totalEnvelopes: 10,
+    rewardMode: 'CHANCE',
 
-  LOCK_DURATION_DAYS: 365,
-  EVENT_LOCK_DURATION_HOURS: 24,
-  TEST_LOCK_DURATION_SECONDS: 60,
+    trollChance: 0.2,
+    specialChance: 0.05,
+    moneyChance: 0.4,
 
-  FATE_STORAGE_KEY: 'lixi_fate_2026'
+    trollCount: 2,
+    specialCount: 1,
+    moneyCount: 4
+  },
+
+  DURATION: {
+    lockDays: 365,
+    eventHours: 24,
+    testSeconds: 60
+  },
+
+  STORAGE: {
+    fateKey: 'lixi_fate_2026',
+    quizSeenKey: 'lixi_quiz_seen_v1'
+  }
 };
 ```
 
 Y nghia nhanh:
 
-- `FREE_MODE: true` -> mo free mode ngay.
-- `EVENT_MODE: true` -> lock theo gio event.
-- `TEST_MODE: true` -> lock ngan de test.
-- `ENABLE_LOCK: false` -> tuong duong free mode.
-- `ENABLE_EXTRA_CHANCE_QUIZ: false` -> tat mini-quiz extra chance.
-- `QUIZ_MAX_ATTEMPTS` -> so lan tra loi quiz toi da.
-- `QUIZ_UNIQUE_PER_DEVICE: true` -> moi cau quiz chi hien thi 1 lan tren 1 thiet bi.
-- `QUIZ_SEEN_STORAGE_KEY` -> key localStorage de luu lich su cau da hien.
-- `OPEN_GATE_ENABLED: true` -> bat che do mo cua theo gio.
-- `OPEN_GATE_AT` -> thoi diem web cho phep vao game.
-- `OPEN_GATE_ALLOW_QUIZ: true` -> cho choi quiz khi dang cho mo cua.
-- `TOTAL_ENVELOPES` -> so bao li xi moi round.
-- `TROLL_CHANCE` -> ti le troll.
-- `SPECIAL_CHANCE` -> ti le ra giai dac biet.
-- `MONEY_CHANCE` -> ti le tien thuong (phan con lai la joke).
-- `SPECIAL_CONFETTI_COUNT` -> mat do confetti khi ra giai dac biet.
-- `SOUND_*_SRC` -> duong dan file am thanh trong `assets/audio`.
+- `MODE` -> chon che do game (`FREE` | `LOCKED` | `EVENT` | `TEST`).
+- `MODE_OPTIONS.allowQueryOverride` -> cho phep override nhanh bang query `?mode=...`.
+- `OPEN_GATE` -> bat/tat mo cua theo gio.
+- `QUIZ` -> cau hinh mini-quiz extra chance.
+- `GAME` -> so bao + kieu chia reward.
+- `GAME.rewardMode: 'CHANCE'` -> dung `trollChance`, `specialChance`, `moneyChance`.
+- `GAME.rewardMode: 'COUNT'` -> dung `trollCount`, `specialCount`, `moneyCount`.
+- Neu tong count vuot `totalEnvelopes`, he thong uu tien giu: `special` -> `money` -> `troll`.
+- `DURATION` -> thoi gian lock cho tung mode.
+- `STORAGE` -> key localStorage.
+
+Mac dinh da de san trong code cho cac thong so ky thuat nhu confetti dac biet, sound source va open-flow face image. Chi can khai bao lai khi ban muon custom nang cao.
+
+Luu y: key kieu cu (flat config) van duoc ho tro de tuong thich nguoc.
 
 ## 6. Thu tu uu tien mode
 
 He thong resolve mode theo thu tu:
 
-1. Query `?mode=` (neu `ALLOW_QUERY_OVERRIDE = true`)
-2. Boolean flags (`FREE_MODE`, `EVENT_MODE`, `TEST_MODE`, `ENABLE_LOCK`)
+1. Query `?mode=` (neu `MODE_OPTIONS.allowQueryOverride = true`)
+2. Boolean flags (chi de tuong thich nguoc): `FREE_MODE`, `EVENT_MODE`, `TEST_MODE`, `ENABLE_LOCK`
 3. `MODE`
 4. Mac dinh `LOCKED`
 

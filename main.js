@@ -21,8 +21,8 @@ const game = createGameEngine(eventBus);
 
 let lastSpeechAt = 0;
 let openingInProgress = false;
-const preOpenQuiz = createQuizEngine();
-const lockedFunQuiz = createQuizEngine();
+const preOpenQuiz = createQuizEngine({ uniquePerDevice: false });
+const lockedFunQuiz = createQuizEngine({ uniquePerDevice: false });
 
 const preOpenState = {
     activeQuiz: false,
@@ -313,7 +313,7 @@ function handleEnvelopeOpenRequest(payload) {
     openFlow.open({
         index: payload.index,
         element: payload.element,
-        faceEmoji: envelope.face?.modalEmoji ?? envelope.face?.emoji ?? '🧧',
+        faceEmoji: envelope.face?.modalEmoji ?? envelope.face?.emoji ?? '(„• ֊ •„)੭',
         faceLabel: envelope.face?.label ?? 'Bao li xi',
         quote: game.getHoverQuote(),
         talkStepEnabled: APP_CONFIG.openFlow.talkStepEnabled,

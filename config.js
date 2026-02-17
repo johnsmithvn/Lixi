@@ -1,80 +1,77 @@
 ﻿window.APP_CONFIG = {
-    // ===== EASY TOGGLE (TRUE/FALSE) =====
-    // FREE_MODE true => bo lock, ai cung choi duoc moi lan vao web.
-    FREE_MODE: false,
-
-    // EVENT_MODE true => lock theo gio su kien (uu tien sau FREE_MODE).
-    EVENT_MODE: false,
-
-    // TEST_MODE true => lock ngan de test nhanh (uu tien sau EVENT_MODE).
-    TEST_MODE: false,
-
-    // Neu muon bat lock binh thuong va khong dung MODE, de true.
-    // Neu de false thi tuong duong FREE_MODE.
-    ENABLE_LOCK: false,
-
-    // ===== OPTIONAL (ADVANCED) =====
-    // MODE fallback khi ban khong dung cac flag ben tren.
+    // ===== CHE DO GAME =====
     // Gia tri: 'FREE' | 'LOCKED' | 'EVENT' | 'TEST'
     MODE: 'LOCKED',
 
     // Cho phep test nhanh bang URL: ?mode=free|locked|event|test
-    ALLOW_QUERY_OVERRIDE: true,
-
-    // LOCKED mode: cho phep mini-quiz de them 1 co hoi.
-    ENABLE_EXTRA_CHANCE_QUIZ: true,
-    QUIZ_MAX_ATTEMPTS: 3,
-    // Khong lap lai cau quiz da tung hien tren cung 1 thiet bi.
-    QUIZ_UNIQUE_PER_DEVICE: true,
-    QUIZ_SEEN_STORAGE_KEY: 'lixi_quiz_seen_v1',
-
-    // ===== OPEN FLOW (MOBILE-FIRST) =====
-    // QUICK: click mo ngay (bo qua popup xac nhan)
-    // DRAMA: 2-3 lop popup truoc khi mo
-    OPEN_FLOW_MODE: 'DRAMA',
-    DRAMA_OPEN_FLOW: true,
-    DRAMA_TALK_STEP: true,
-    DRAMA_FINAL_STEP: true,
-    // Ti le random hien buoc FINAL (0 -> 1). Vi du 0.4 = 40%
-    OPEN_FLOW_FINAL_RANDOM_CHANCE: 0.4,
-    // Dẫn link ảnh trong thư mục assets (nếu để null thì dùng emoji mặc định)
-    // Ví dụ: '/assets/images/confirm-face.png'
-    OPEN_FLOW_CONFIRM_FACE_IMAGE: '/assets/images/suynghi.jpg',
-    OPEN_FLOW_FINAL_FACE_IMAGE: null,
+    MODE_OPTIONS: {
+        allowQueryOverride: true
+    },
 
     // ===== OPEN GATE (THOI GIAN MO CUA WEB) =====
-    // Bat/tat che do cho mo cua theo thoi gian.
-    OPEN_GATE_ENABLED: true,
-    // Dinh dang de xuat: '2026-02-20T20:00:00+07:00'
-    OPEN_GATE_AT: '2026-02-17T17:00:00+07:00',
-    // Cho phep choi quiz trong luc cho mo cua.
-    OPEN_GATE_ALLOW_QUIZ: true,
+    OPEN_GATE: {
+        enabled: false,
+        // Vi du: '2026-02-20T20:00:00+07:00'
+        at: '2026-02-16T17:00:00+07:00',
+        // Cho phep choi quiz trong luc cho mo cua
+        allowQuiz: true
+    },
+
+    // ===== QUIZ =====
+    QUIZ: {
+        // So lan tra loi mini-quiz toi da trong 1 session lock.
+        // Dat = 0 de khoa mini-quiz.
+        maxAttempts: 1,
+        // LOCKED mode co cho mini-quiz de mo them co hoi hay khong.
+        enabledInLockedMode: true,
+        // true: Trung money/special se duoc mo tiep ngay, khong can quiz.
+        // Ket qua trung truoc do duoc giu, khong bi doi thanh ket qua truot sau.
+        winContinueMode: true,
+        // true: moi cau hoi chi hien 1 lan tren 1 thiet bi (luu localStorage).
+        // false: co the lap lai cau hoi.
+        uniquePerDevice: true
+    },
 
     // ===== GAME BALANCE =====
-    TOTAL_ENVELOPES: 20,
-    TROLL_CHANCE: 0.2, // 20%
-    // Giai dac biet lon nhat (uu tien truoc money)
-    SPECIAL_CHANCE: 0.2, // 5%
-    MONEY_CHANCE: 0.4, // 40%
-    SPECIAL_CONFETTI_COUNT: 420,
+    GAME: {
+        totalEnvelopes: 30,
+        // 'CHANCE' = theo ti le % ; 'COUNT' = theo so luong
+        rewardMode: 'COUNT',
 
-    // ===== AUDIO SOURCES (OPTIONAL) =====
-    // Dat file trong assets/audio va dien duong dan nhu ben duoi.
-    // Neu bo trong/null, he thong se dung am fallback.
-    SOUND_CLICK_SRC: '/assets/audio/click.mp3',
-    SOUND_WIN_SRC: '/assets/audio/win.mp3',
-    SOUND_TROLL_SRC: '/assets/audio/troll.mp3',
-    SOUND_SPECIAL_SRC: '/assets/audio/special.mp3',
+        // CHANCE mode
+        trollChance: 0.2,
+        specialChance: 0.2,
+        moneyChance: 0.4,
 
-    // ===== LOCK DURATION (DANG DE DOC) =====
-    LOCK_DURATION_DAYS: 365,
-    EVENT_LOCK_DURATION_HOURS: 24,
-    TEST_LOCK_DURATION_SECONDS: 60,
+        // COUNT mode (chi dung khi rewardMode = 'COUNT')
+        // Neu tong vuot totalEnvelopes, uu tien giu: special -> money -> troll.
+        trollCount: 2,
+        specialCount: 1,
+        moneyCount: 6
+    },
 
-    // ===== LEGACY MS (neu ban thich dung ms) =====
-    // LOCK_DURATION_MS: 365 * 24 * 60 * 60 * 1000,
-    // EVENT_LOCK_DURATION_MS: 24 * 60 * 60 * 1000,
-    // TEST_LOCK_DURATION_MS: 60 * 1000,
+    // ===== TIMINGS =====
+    TIMINGS: {
+        // Delay hien "reveal troll" trong modal ket qua (don vi: ms).
+        // Vi du: 1200 = 1.2s.
+        trollRevealDelayMs: 1111
+    },
 
-    FATE_STORAGE_KEY: 'lixi_fate_2026'
+    // ===== LOCK DURATION =====
+    DURATION: {
+        // LOCKED mode: khoa trong bao nhieu ngay.
+        lockDays: 365,
+        // EVENT mode: khoa trong bao nhieu gio.
+        eventHours: 24,
+        // TEST mode: khoa trong bao nhieu giay.
+        testSeconds: 60
+    },
+
+    // ===== STORAGE KEYS =====
+    STORAGE: {
+        // Key luu trang thai lock/fate.
+        fateKey: 'lixi_fate_2026',
+        // Key luu lich su cau quiz da hien (de tranh lap cau).
+        quizSeenKey: 'lixi_quiz_seen_v1'
+    }
 };

@@ -10,6 +10,9 @@ export function createModalController() {
         refs.resultIcon = document.getElementById('result-icon');
         refs.resultMain = document.getElementById('result-main');
         refs.resultSub = document.getElementById('result-sub');
+        refs.specialBlessing = document.getElementById('special-blessing');
+        refs.specialBlessingTitle = refs.specialBlessing?.querySelector('.special-blessing-title') ?? null;
+        refs.specialBlessingList = document.getElementById('special-blessing-list');
         refs.specialNote = document.getElementById('special-note');
         refs.specialNoteImage = document.getElementById('special-note-image');
         refs.specialNoteText = document.getElementById('special-note-text');
@@ -55,24 +58,51 @@ export function createModalController() {
         refs.resultIcon.textContent = result.icon;
         refs.resultMain.textContent = result.title;
         refs.resultSub.textContent = result.text;
-
-        if (result.type === 'special' && Array.isArray(result.blessingList) && result.blessingList.length > 0) {
-            const blessingLines = result.blessingList.map((item) => `• ${item}`);
-            refs.resultSub.textContent = [result.text, ...blessingLines].join('\n');
+        refs.specialBlessing.classList.add('hidden');
+        refs.specialBlessingList.innerHTML = '';
+        refs.resultSub.classList.remove('result-sub--blessing');
+        if (refs.specialBlessingTitle) {
+            refs.specialBlessingTitle.textContent = '🌟 Lời chúc giải đặc biệt';
         }
         refs.resultSub.classList.remove('strike');
         refs.specialNote.classList.add('hidden');
         refs.resultClaimNote.classList.add('hidden');
         refs.resultClaimNote.textContent = '';
         refs.specialNoteText.textContent = '';
+        refs.resultStreak.textContent = '';
+        refs.resultStreak.classList.add('hidden');
+        refs.resultStreak.classList.remove('result-streak--special');
 
-        refs.resultStreak.textContent = result.type === 'special'
-            ? '👑 Giải đặc biệt đã kích hoạt. Năm nay quá rực rỡ!'
-            : result.type === 'money'
-            ? `🔥 Chuỗi may mắn: x${result.streak}`
-            : 'Chuỗi may mắn hiện tại: x0';
+        if (result.type === 'money' || result.type === 'special') {
+            const blessingItems = result.type === 'special'
+                ? (Array.isArray(result.blessingList) && result.blessingList.length > 0
+                    ? result.blessingList
+                    : (typeof result.blessing === 'string' && result.blessing.trim().length > 0 ? [result.blessing.trim()] : []))
+                : (typeof result.blessing === 'string' && result.blessing.trim().length > 0 ? [result.blessing.trim()] : []);
+
+            if (refs.specialBlessingTitle) {
+                refs.specialBlessingTitle.textContent = result.type === 'special'
+                    ? '🌟 Lời chúc giải đặc biệt'
+                    : '🌿 Lời chúc nhận lộc';
+            }
+
+            blessingItems.forEach((item) => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                refs.specialBlessingList.appendChild(li);
+            });
+            refs.specialBlessing.classList.toggle('hidden', blessingItems.length === 0);
+        }
+
+        if (result.type === 'joke') {
+            refs.resultSub.classList.add('result-sub--blessing');
+        }
 
         if (result.type === 'special') {
+            refs.resultStreak.textContent = '👑 Giải đặc biệt đã kích hoạt. Năm nay quá rực rỡ!';
+            refs.resultStreak.classList.remove('hidden');
+            refs.resultStreak.classList.add('result-streak--special');
+
             refs.specialNoteImage.src = '/assets/images/daudau.png';
             refs.specialNoteText.textContent = 'Chúc mừng! Bạn vừa móc được túi mình thành công';
             refs.specialNote.classList.remove('hidden');
@@ -90,7 +120,7 @@ export function createModalController() {
 
         if (result.type === 'troll') {
             trollRevealTimer = window.setTimeout(() => {
-                refs.resultMain.textContent = 'Haha gotcha! 🤡';
+                refs.resultMain.textContent = 'Haha gotcha! Không có đâu nỡm ạ!';
                 refs.resultSub.classList.add('strike');
                 refs.trollReveal.textContent = result.reveal;
                 refs.trollReveal.classList.remove('hidden');
@@ -109,6 +139,10 @@ export function createModalController() {
         refs.extraChanceBtn.classList.add('hidden');
         refs.resultClaimNote.classList.add('hidden');
         refs.playAgainBtn.classList.remove('hidden');
+        refs.resultStreak.classList.add('hidden');
+        refs.resultStreak.classList.remove('result-streak--special');
+        refs.specialBlessing.classList.add('hidden');
+        refs.specialBlessingList.innerHTML = '';
     }
 
     return {

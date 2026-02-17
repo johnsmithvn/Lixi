@@ -2,6 +2,8 @@
     CHOICE_QUIZ_SET,
     QUIZ_KINDS,
     QUIZ_KIND_OPTIONS,
+    REACTION_DYNAMIC_CONFIG,
+    STROOP_DYNAMIC_CONFIG,
     WORD_PUZZLE_SET
 } from './quizData.js';
 import { APP_CONFIG } from '../core/config.js';
@@ -51,12 +53,12 @@ function getKindKey(quizKind) {
     return 'choice';
 }
 
-function pickQuestion(pool, quizKind) {
+function pickQuestion(pool, quizKind, uniquePerDeviceEnabled) {
     if (!Array.isArray(pool) || pool.length === 0) {
         return null;
     }
 
-    if (APP_CONFIG.quiz.uniquePerDevice !== true) {
+    if (uniquePerDeviceEnabled !== true) {
         return randomItem(pool);
     }
 
@@ -209,6 +211,137 @@ function sanitizeChoiceQuestion(question) {
     };
 }
 
+const DYNAMIC_STROOP_COLOR_POOL = Object.freeze(
+    (Array.isArray(STROOP_DYNAMIC_CONFIG?.colors) ? STROOP_DYNAMIC_CONFIG.colors : [])
+        .map((item) => ({
+            token: String(item?.token ?? '').trim().toLowerCase(),
+            label: String(item?.label ?? '').trim()
+        }))
+        .filter((item) => item.token.length > 0 && item.label.length > 0)
+);
+
+const DYNAMIC_STROOP_MEDIA_POOL = Object.freeze(
+    (Array.isArray(STROOP_DYNAMIC_CONFIG?.mediaPool) ? STROOP_DYNAMIC_CONFIG.mediaPool : [])
+        .map((item) => String(item ?? '').trim())
+        .filter(Boolean)
+);
+
+const DYNAMIC_REACTION_MEDIA_POOL = Object.freeze(
+    (Array.isArray(REACTION_DYNAMIC_CONFIG?.mediaPool) ? REACTION_DYNAMIC_CONFIG.mediaPool : [])
+        .map((item) => String(item ?? '').trim())
+        .filter(Boolean)
+);
+
+const DYNAMIC_REACTION_PROMPTS = Object.freeze(
+    (Array.isArray(REACTION_DYNAMIC_CONFIG?.prompts) ? REACTION_DYNAMIC_CONFIG.prompts : [])
+        .map((item) => String(item ?? '').trim())
+        .filter(Boolean)
+);
+
+const DYNAMIC_REACTION_BUTTON_LABELS = Object.freeze(
+    (Array.isArray(REACTION_DYNAMIC_CONFIG?.buttonLabels) ? REACTION_DYNAMIC_CONFIG.buttonLabels : [])
+        .map((item) => String(item ?? '').trim())
+        .filter(Boolean)
+);
+
+function shuffleList(list) {
+    const next = Array.isArray(list) ? [...list] : [];
+    for (let i = next.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = next[i];
+        next[i] = next[j];
+        next[j] = tmp;
+    }
+
+    return next;
+}
+
+function createDynamicId(prefix) {
+    return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`;
+}
+
+function buildDynamicStroopQuestion() {
+    if (DYNAMIC_STROOP_COLOR_POOL.length < 2) {
+        return null;
+    }
+
+    const target = randomItem(DYNAMIC_STROOP_COLOR_POOL);
+    const answerTexts = shuffleList(DYNAMIC_STROOP_COLOR_POOL.map((item) => item.label));
+    const answerColors = shuffleList(DYNAMIC_STROOP_COLOR_POOL.map((item) => item.token));
+    const correctIndex = answerColors.indexOf(target.token);
+
+    // Keep Stroop effect: avoid letting the correct button text match target label.
+    if (correctIndex >= 0 && answerTexts[correctIndex] === target.label && answerTexts.length > 1) {
+        const swapIndex = answerTexts.findIndex((text, index) => index !== correctIndex && text !== target.label);
+        if (swapIndex >= 0) {
+            const tmp = answerTexts[correctIndex];
+            answerTexts[correctIndex] = answerTexts[swapIndex];
+            answerTexts[swapIndex] = tmp;
+        }
+    }
+
+    const answerTimeMin = asPositiveInt(STROOP_DYNAMIC_CONFIG?.answerTimeMsMin, 4400);
+    const answerTimeMax = asPositiveInt(STROOP_DYNAMIC_CONFIG?.answerTimeMsMax, 5600);
+    const answerTimeMs = randomInt(Math.min(answerTimeMin, answerTimeMax), Math.max(answerTimeMin, answerTimeMax));
+    const media = DYNAMIC_STROOP_MEDIA_POOL.length > 0 ? randomItem(DYNAMIC_STROOP_MEDIA_POOL) : null;
+
+    return {
+        id: createDynamicId('stroop'),
+        quizKind: QUIZ_KINDS.STROOP,
+        type: 'stroop',
+        question: `Hãy bấm vào chữ ${target.label}`,
+        media,
+        answerTimeMs,
+        targetColor: target.token,
+        answers: answerTexts.map((text, index) => ({
+            text,
+            colorToken: answerColors[index],
+            correct: answerColors[index] === target.token
+        }))
+    };
+}
+
+function buildDynamicReactionQuestion() {
+    const waitMinMs = asPositiveInt(REACTION_DYNAMIC_CONFIG?.waitMinMs, 1000);
+    const waitMaxMs = asPositiveInt(REACTION_DYNAMIC_CONFIG?.waitMaxMs, 4000);
+    const responseWindowMs = asPositiveInt(REACTION_DYNAMIC_CONFIG?.responseWindowMs, 500);
+    const media = DYNAMIC_REACTION_MEDIA_POOL.length > 0 ? randomItem(DYNAMIC_REACTION_MEDIA_POOL) : null;
+    const question = DYNAMIC_REACTION_PROMPTS.length > 0
+        ? randomItem(DYNAMIC_REACTION_PROMPTS)
+        : 'Đợi tín hiệu rồi bấm thật nhanh!';
+    const buttonLabel = DYNAMIC_REACTION_BUTTON_LABELS.length > 0
+        ? randomItem(DYNAMIC_REACTION_BUTTON_LABELS)
+        : '🎉 BẤM NGAY!';
+
+    return {
+        id: createDynamicId('reaction'),
+        quizKind: QUIZ_KINDS.REACTION,
+        type: 'reaction',
+        question,
+        buttonLabel,
+        media,
+        readyDelayMs: randomInt(Math.min(waitMinMs, waitMaxMs), Math.max(waitMinMs, waitMaxMs)),
+        responseWindowMs
+    };
+}
+
+function asPositiveInt(rawValue, fallback) {
+    const value = Number(rawValue);
+    if (!Number.isFinite(value) || value <= 0) {
+        return fallback;
+    }
+
+    return Math.round(value);
+}
+
+function randomInt(min, max) {
+    if (max <= min) {
+        return min;
+    }
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function sanitizeWordPuzzle(question) {
     if (!question || typeof question !== 'object') {
         return null;
@@ -276,7 +409,15 @@ function buildWordQuestion(baseQuestion) {
     };
 }
 
-export function createQuizEngine() {
+function buildReactionQuestion() {
+    return buildDynamicReactionQuestion();
+}
+
+export function createQuizEngine(options = {}) {
+    const uniquePerDeviceEnabled = typeof options?.uniquePerDevice === 'boolean'
+        ? options.uniquePerDevice
+        : APP_CONFIG.quiz.uniquePerDevice === true;
+
     const choicePool = CHOICE_QUIZ_SET.map(sanitizeChoiceQuestion).filter(Boolean);
     const wordPool = WORD_PUZZLE_SET.map(sanitizeWordPuzzle).filter(Boolean);
 
@@ -288,11 +429,23 @@ export function createQuizEngine() {
 
     function start(quizKind = QUIZ_KINDS.CHOICE) {
         if (quizKind === QUIZ_KINDS.WORD) {
-            currentQuestion = buildWordQuestion(pickQuestion(wordPool, QUIZ_KINDS.WORD));
+            currentQuestion = buildWordQuestion(
+                pickQuestion(wordPool, QUIZ_KINDS.WORD, uniquePerDeviceEnabled)
+            );
             return currentQuestion;
         }
 
-        currentQuestion = pickQuestion(choicePool, QUIZ_KINDS.CHOICE);
+        if (quizKind === QUIZ_KINDS.STROOP) {
+            currentQuestion = buildDynamicStroopQuestion();
+            return currentQuestion;
+        }
+
+        if (quizKind === QUIZ_KINDS.REACTION) {
+            currentQuestion = buildReactionQuestion();
+            return currentQuestion;
+        }
+
+        currentQuestion = pickQuestion(choicePool, QUIZ_KINDS.CHOICE, uniquePerDeviceEnabled);
         return currentQuestion;
     }
 
@@ -314,6 +467,56 @@ export function createQuizEngine() {
             return {
                 correct: normalizeText(guess) === currentQuestion.normalizedAnswer,
                 answerText: guess,
+                questionId: currentQuestion.id,
+                questionType: currentQuestion.type,
+                quizKind: currentQuestion.quizKind
+            };
+        }
+
+        if (currentQuestion.quizKind === QUIZ_KINDS.REACTION) {
+            const timing = typeof answerPayload === 'object' && answerPayload !== null
+                ? answerPayload.timing
+                : null;
+
+            if (timing !== 'early' && timing !== 'ready' && timing !== 'late') {
+                return null;
+            }
+
+            const reactionMs = Number(answerPayload?.reactionMs);
+            const readyDelayMs = Number(answerPayload?.readyDelayMs ?? currentQuestion.readyDelayMs);
+            const responseWindowMs = Number(answerPayload?.responseWindowMs ?? currentQuestion.responseWindowMs);
+
+            return {
+                correct: timing === 'ready',
+                answerText: timing === 'ready'
+                    ? `Phản xạ ${Number.isFinite(reactionMs) ? Math.max(0, Math.round(reactionMs)) : 0}ms`
+                    : timing === 'early'
+                        ? 'Bấm sớm mất rồi'
+                        : 'Bấm trễ mất rồi',
+                timing,
+                reactionMs: Number.isFinite(reactionMs) ? Math.max(0, Math.round(reactionMs)) : null,
+                readyDelayMs: Number.isFinite(readyDelayMs) ? Math.max(0, Math.round(readyDelayMs)) : currentQuestion.readyDelayMs,
+                responseWindowMs: Number.isFinite(responseWindowMs)
+                    ? Math.max(0, Math.round(responseWindowMs))
+                    : currentQuestion.responseWindowMs,
+                questionId: currentQuestion.id,
+                questionType: currentQuestion.type,
+                quizKind: currentQuestion.quizKind
+            };
+        }
+
+        if (currentQuestion.quizKind === QUIZ_KINDS.STROOP && answerPayload?.timing === 'timeout') {
+            const correctAnswerIndexes = currentQuestion.answers
+                .map((answer, answerIndex) => (answer.correct ? answerIndex : -1))
+                .filter((answerIndex) => answerIndex >= 0);
+
+            return {
+                correct: false,
+                answerText: 'Hết giờ',
+                selectedAnswerIndex: -1,
+                correctAnswerIndexes,
+                timing: 'timeout',
+                answerTimeMs: currentQuestion.answerTimeMs,
                 questionId: currentQuestion.id,
                 questionType: currentQuestion.type,
                 quizKind: currentQuestion.quizKind

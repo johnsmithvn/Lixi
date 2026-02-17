@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Máy Lì Xì PRO++</title>
+    <title>Siu cấp vip pro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -27,15 +27,20 @@
         </section>
 
         <section id="game-screen" class="screen">
-            <h2 class="game-title">Chọn một bao lì xì nào! 🧧</h2>
+            <h2 class="game-title">Chọn một bao lì xì nào! („• ֊ •„)੭</h2>
             <p class="game-subtitle">Hover để nghe bao nói, click để mở!</p>
 
             <div class="game-hud">
                 <p id="opened-counter">Đã mở: 0/10</p>
-                <p id="streak-counter">🔥 Chuỗi may mắn: x0</p>
+                <p id="streak-counter" class="hidden"></p>
             </div>
 
             <div id="envelope-grid" class="envelope-grid"></div>
+
+            <footer id="lock-footer" class="lock-footer hidden" aria-live="polite">
+                <p id="lock-footer-open-at" class="lock-footer-line"></p>
+                <p id="lock-footer-countdown" class="lock-footer-line lock-footer-line--countdown"></p>
+            </footer>
 
             <div id="envelope-speech" class="speech-bubble hidden">
                 <span id="speech-text"></span>
@@ -72,10 +77,11 @@
 
                 <div class="opening-actions">
                     <button id="opening-quiz-btn" class="opening-quiz-btn" type="button">🧠 Chơi quiz trong lúc chờ</button>
-                    <button id="opening-enter-btn" class="opening-enter-btn hidden" type="button">🧧 Vào mở lì xì ngay</button>
+                    <button id="opening-enter-btn" class="opening-enter-btn hidden" type="button">(„• ֊ •„)੭ Vào mở lì xì ngay</button>
                 </div>
             </article>
         </section>
+
     </div>
 
     <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="result-main">
@@ -84,12 +90,16 @@
             <div id="result-icon" class="result-icon"></div>
             <div id="result-main" class="result-main"></div>
             <div id="result-sub" class="result-sub"></div>
+            <div id="special-blessing" class="special-blessing hidden">
+                <p class="special-blessing-title">🌟 Lời chúc giải đặc biệt</p>
+                <ul id="special-blessing-list" class="special-blessing-list"></ul>
+            </div>
             <div id="special-note" class="special-note hidden">
                 <img id="special-note-image" class="special-note-image" src="/assets/images/daudau.png" alt="Ảnh giải đặc biệt">
                 <p id="special-note-text" class="special-note-text">Chúc mừng! Bạn vừa móc được túi mình thành công</p>
             </div>
             <div id="result-claim-note" class="result-claim-note hidden"></div>
-            <div id="result-streak" class="result-streak"></div>
+            <div id="result-streak" class="result-streak hidden"></div>
             <div id="troll-reveal" class="troll-reveal hidden"></div>
 
             <div class="modal-actions">

@@ -18,22 +18,27 @@ function formatRemainingTime(expireAt) {
 
     const diff = expireAt - Date.now();
     if (diff <= 0) {
-        return 'Bạn đã có thể thử lại rồi.';
+        return 'Đã đến lúc mở lại rồi.';
     }
 
     const days = Math.floor(diff / (24 * 60 * 60 * 1000));
     const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
     const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+    const seconds = Math.floor((diff % (60 * 1000)) / 1000);
 
     if (days > 0) {
-        return `Còn khoảng ${days} ngày ${hours} giờ để mở lại.`;
+        return `Còn khoảng ${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây để mở lại.`;
     }
 
     if (hours > 0) {
-        return `Còn khoảng ${hours} giờ ${minutes} phút để mở lại.`;
+        return `Còn khoảng ${hours} giờ ${minutes} phút ${seconds} giây để mở lại.`;
     }
 
-    return `Còn khoảng ${Math.max(1, minutes)} phút để mở lại.`;
+    if (minutes > 0) {
+        return `Còn khoảng ${minutes} phút ${seconds} giây để mở lại.`;
+    }
+
+    return `Còn khoảng ${Math.max(1, seconds)} giây để mở lại.`;
 }
 
 function getModeLabel(mode) {
@@ -96,16 +101,11 @@ function getResultBadge(resultType) {
     return { text: '😂 Quà tinh thần', tone: 'joke' };
 }
 
-function extractMoneyAmount(title) {
-    if (typeof title !== 'string') {
+function getLockStopMessage(reason, resultType) {
+    if (resultType === 'money' || resultType === 'special') {
         return null;
     }
 
-    const match = title.match(/([0-9][0-9.,]*đ)/i);
-    return match ? match[1] : null;
-}
-
-function getLockStopMessage(reason) {
     if (reason === 'quiz_failed') {
         return 'Vận may đang ngủ trưa… nhắn chủ thớt đánh thức giúp!';
     }
@@ -125,13 +125,47 @@ function getResultImageSrc(resultType) {
     return '/assets/images/leuleu.jpg';
 }
 
-function createResultImage(resultType) {
+function getLatestResultImageCaption(resultType) {
+    if (resultType === 'money') {
+        return 'Bạn vừa kích hoạt chế độ: Chủ xị hao hụt tài sản.';
+    }
+
+    if (resultType === 'special') {
+        return 'Chúc mừng! Bạn vừa móc được túi mình thành công';
+    }
+
+    return null;
+}
+
+function getLatestResultDetailText(result) {
+    if (!result || typeof result !== 'object') {
+        return null;
+    }
+
+    if (result.type === 'money') {
+        return null;
+    }
+
+    if (result.type === 'troll' || result.type === 'joke') {
+        return 'Suýt nữa là trúng rồi đó 😆';
+    }
+
+    if (typeof result.text === 'string' && result.text.trim().length > 0) {
+        return result.text;
+    }
+
+    return null;
+}
+
+function createResultImage(resultType, imageSrcOverride = null) {
     const imageWrap = document.createElement('div');
     imageWrap.className = 'result-image-wrap';
 
     const image = document.createElement('img');
     image.className = 'result-image';
-    image.src = getResultImageSrc(resultType);
+    image.src = typeof imageSrcOverride === 'string' && imageSrcOverride.trim().length > 0
+        ? imageSrcOverride.trim()
+        : getResultImageSrc(resultType);
     image.alt = resultType === 'money' || resultType === 'special'
         ? 'Ảnh chúc mừng trúng lộc'
         : 'Ảnh vui nhộn an ủi';
@@ -140,7 +174,7 @@ function createResultImage(resultType) {
     return imageWrap;
 }
 
-function createLatestResultBlock(result, heading = '🎉 Kết quả gần nhất của bạn') {
+function createLatestResultBlock(result, heading = '🎉 Kết quả gần nhất của bạn', options = {}) {
     if (!result || (!result.title && !result.text)) {
         return null;
     }
@@ -158,40 +192,37 @@ function createLatestResultBlock(result, heading = '🎉 Kết quả gần nhấ
     badgeEl.className = `latest-result-badge latest-result-badge--${badge.tone}`;
     badgeEl.textContent = badge.text;
     latestBlock.appendChild(badgeEl);
-    latestBlock.appendChild(createResultImage(result.type));
+
+    const imageElement = createResultImage(result.type, options?.imageSrcOverride ?? null);
+    const imageCaption = getLatestResultImageCaption(result.type);
+
+    if (imageCaption) {
+        const imageCard = document.createElement('div');
+        imageCard.className = 'latest-result-image-card';
+        imageCard.appendChild(imageElement);
+
+        const imageCaptionText = document.createElement('p');
+        imageCaptionText.className = 'latest-result-image-note';
+        imageCaptionText.textContent = imageCaption;
+        imageCard.appendChild(imageCaptionText);
+
+        latestBlock.appendChild(imageCard);
+    } else {
+        latestBlock.appendChild(imageElement);
+    }
 
     const resultMain = document.createElement('p');
     resultMain.className = 'latest-result-main';
     resultMain.textContent = result.title ?? 'Bạn đã mở 1 bao lì xì.';
     latestBlock.appendChild(resultMain);
 
-    const moneyAmount = result.type === 'money'
-        ? (extractMoneyAmount(result.title) ?? extractMoneyAmount(result.text))
-        : null;
-
-    if (moneyAmount) {
-        const amountEl = document.createElement('p');
-        amountEl.className = 'latest-result-amount';
-        amountEl.textContent = `Giá trị nổi bật: ${moneyAmount}`;
-        latestBlock.appendChild(amountEl);
-    }
-
-    const detailText = result.type === 'troll'
-        ? (result.reveal ?? result.text)
-        : result.text;
+    const detailText = getLatestResultDetailText(result);
 
     if (detailText) {
         const detail = document.createElement('p');
         detail.className = 'latest-result-detail';
         detail.textContent = detailText;
         latestBlock.appendChild(detail);
-    }
-
-    if ((result.type === 'money' || result.type === 'special') && result.claimNote) {
-        const claim = document.createElement('p');
-        claim.className = 'latest-result-claim';
-        claim.textContent = result.claimNote;
-        latestBlock.appendChild(claim);
     }
 
     const blessingItems = Array.isArray(result.blessingList) && result.blessingList.length > 0
@@ -205,6 +236,13 @@ function createLatestResultBlock(result, heading = '🎉 Kết quả gần nhấ
         latestBlock.appendChild(blessing);
     });
 
+    if ((result.type === 'money' || result.type === 'special') && result.claimNote) {
+        const claim = document.createElement('p');
+        claim.className = 'latest-result-claim';
+        claim.textContent = result.claimNote;
+        latestBlock.appendChild(claim);
+    }
+
     return latestBlock;
 }
 
@@ -216,6 +254,7 @@ export function createRenderer() {
     };
 
     let hideSpeechTimer;
+    let lockFooterTimerId;
 
     function cacheRefs() {
         refs.startBtn = document.getElementById('start-btn');
@@ -228,6 +267,9 @@ export function createRenderer() {
         refs.envelopeGrid = document.getElementById('envelope-grid');
         refs.openedCounter = document.getElementById('opened-counter');
         refs.streakCounter = document.getElementById('streak-counter');
+        refs.lockFooter = document.getElementById('lock-footer');
+        refs.lockFooterOpenAt = document.getElementById('lock-footer-open-at');
+        refs.lockFooterCountdown = document.getElementById('lock-footer-countdown');
 
         refs.speechBubble = document.getElementById('envelope-speech');
         refs.speechText = document.getElementById('speech-text');
@@ -263,12 +305,82 @@ export function createRenderer() {
         });
 
         document.getElementById(id)?.classList.add('active');
+
+        if (id !== 'game-screen') {
+            hideLockFooter();
+        }
+    }
+
+    function clearLockFooterTimer() {
+        if (lockFooterTimerId) {
+            clearInterval(lockFooterTimerId);
+            lockFooterTimerId = undefined;
+        }
+    }
+
+    function hideLockFooter() {
+        clearLockFooterTimer();
+
+        if (!refs.lockFooter) {
+            return;
+        }
+
+        refs.lockFooter.classList.add('hidden');
+        if (refs.lockFooterOpenAt) {
+            refs.lockFooterOpenAt.textContent = '';
+        }
+        if (refs.lockFooterCountdown) {
+            refs.lockFooterCountdown.textContent = '';
+        }
+    }
+
+    function renderLockFooter(expireAt) {
+        if (!refs.lockFooter || !Number.isFinite(expireAt)) {
+            hideLockFooter();
+            return;
+        }
+
+        const retryAt = formatDateTime(expireAt);
+        const remaining = formatRemainingTime(expireAt);
+
+        if (!retryAt && !remaining) {
+            hideLockFooter();
+            return;
+        }
+
+        refs.lockFooterOpenAt.textContent = retryAt ? `Có thể mở lại từ: ${retryAt}` : '';
+        refs.lockFooterCountdown.textContent = remaining ?? '';
+        refs.lockFooter.classList.remove('hidden');
+
+        if (expireAt <= Date.now()) {
+            clearLockFooterTimer();
+        }
+    }
+
+    function showLockFooter(expireAt) {
+        if (!Number.isFinite(expireAt)) {
+            hideLockFooter();
+            return;
+        }
+
+        clearLockFooterTimer();
+        renderLockFooter(expireAt);
+
+        if (expireAt > Date.now()) {
+            lockFooterTimerId = window.setInterval(() => {
+                renderLockFooter(expireAt);
+            }, 1000);
+        }
     }
 
     function resetLockedLayout() {
+        hideLockFooter();
         refs.envelopeGrid.classList.remove('locked-grid');
         refs.gameTitle.textContent = defaults.title;
         refs.gameSubtitle.textContent = defaults.subtitle;
+        refs.streakCounter.textContent = '';
+        refs.streakCounter.classList.remove('hot');
+        refs.streakCounter.classList.add('hidden');
     }
 
     function renderEnvelopes(envelopes, handlers) {
@@ -282,8 +394,9 @@ export function createRenderer() {
 
     function updateHud(gameState) {
         refs.openedCounter.textContent = `Đã mở: ${gameState.openedCount}/${APP_CONFIG.totalEnvelopes}`;
-        refs.streakCounter.textContent = `🔥 Chuỗi may mắn: x${gameState.streak}`;
-        refs.streakCounter.classList.toggle('hot', gameState.streak >= 3);
+        refs.streakCounter.textContent = '';
+        refs.streakCounter.classList.remove('hot');
+        refs.streakCounter.classList.add('hidden');
     }
 
     function showSpeech(message) {
@@ -314,10 +427,11 @@ export function createRenderer() {
 
         showScreen('game-screen');
         hideSpeech(true);
+        hideLockFooter();
 
         refs.gameTitle.textContent = isWinningReroll
-            ? '🧧 Bạn đã trúng rồi, muốn bốc lại không?'
-            : '🧧 Vận may đang khởi động lại….';
+            ? '(„• ֊ •„)੭ Bạn đã trúng rồi, muốn bốc lại không?'
+            : '(„• ֊ •„)੭ Vận may đang khởi động lại….';
         refs.gameSubtitle.textContent = isWinningReroll
             ? 'Vượt quiz để mở thêm 1 bao và ghi đè kết quả cũ.'
             : 'Nhưng bạn có thể thử thêm 1 cơ hội nữa!';
@@ -326,6 +440,7 @@ export function createRenderer() {
             ? '🎯 Bonus: Qua quiz để bốc lại kết quả'
             : '🎯 Bonus: Vượt quiz là được mở thêm 1 bao';
         refs.streakCounter.textContent = `Mini Quiz: còn ${remainingAttempts}/${maxAttempts} lượt trả lời`;
+        refs.streakCounter.classList.remove('hidden');
         refs.streakCounter.classList.remove('hot');
 
         refs.envelopeGrid.classList.add('locked-grid');
@@ -349,7 +464,10 @@ export function createRenderer() {
         card.appendChild(title);
         card.appendChild(message);
 
-        const latestBlock = createLatestResultBlock(latestResult, 'Kết quả vừa rồi');
+        const extraChanceMoneyImageSrc = latestResult?.type === 'money' ? '/assets/images/uwu.jpg' : null;
+        const latestBlock = createLatestResultBlock(latestResult, 'Kết quả vừa rồi', {
+            imageSrcOverride: extraChanceMoneyImageSrc
+        });
         if (latestBlock) {
             card.appendChild(latestBlock);
         }
@@ -371,11 +489,12 @@ export function createRenderer() {
         showScreen('game-screen');
         hideSpeech(true);
 
-        refs.gameTitle.textContent = '🧧 Vận may của bạn đã được mở rồi!';
+        refs.gameTitle.textContent = '(„• ֊ •„)੭ Vận may của bạn đã được mở rồi!';
         refs.gameSubtitle.textContent = getLockedHint(mode);
 
         refs.openedCounter.textContent = '🔒 Trạng thái: đã khóa lượt bốc';
         refs.streakCounter.textContent = `Mode: ${getModeLabel(mode)}`;
+        refs.streakCounter.classList.remove('hidden');
         refs.streakCounter.classList.remove('hot');
 
         refs.envelopeGrid.classList.add('locked-grid');
@@ -395,7 +514,7 @@ export function createRenderer() {
         card.appendChild(title);
         card.appendChild(message);
 
-        const stopMessage = getLockStopMessage(fate?.meta?.reason);
+        const stopMessage = getLockStopMessage(fate?.meta?.reason, fate?.result?.type);
         if (stopMessage) {
             const stopText = document.createElement('p');
             stopText.className = 'locked-remaining';
@@ -403,25 +522,12 @@ export function createRenderer() {
             card.appendChild(stopText);
         }
 
-        const latestBlock = createLatestResultBlock(fate?.result, '🎉 Kết quả gần nhất của bạn');
+        const lockedMoneyImageSrc = fate?.result?.type === 'money' ? '/assets/images/uwu.jpg' : null;
+        const latestBlock = createLatestResultBlock(fate?.result, '🎉 Kết quả gần nhất của bạn', {
+            imageSrcOverride: lockedMoneyImageSrc
+        });
         if (latestBlock) {
             card.appendChild(latestBlock);
-        }
-
-        const retryAt = formatDateTime(fate?.expireAt);
-        if (retryAt) {
-            const retryText = document.createElement('p');
-            retryText.className = 'locked-meta';
-            retryText.textContent = `Có thể mở lại từ: ${retryAt}`;
-            card.appendChild(retryText);
-        }
-
-        const remainingText = formatRemainingTime(fate?.expireAt);
-        if (remainingText) {
-            const remaining = document.createElement('p');
-            remaining.className = 'locked-remaining';
-            remaining.textContent = remainingText;
-            card.appendChild(remaining);
         }
 
         if (typeof handlers.onPlayQuiz === 'function') {
@@ -434,6 +540,7 @@ export function createRenderer() {
         }
 
         refs.envelopeGrid.appendChild(card);
+        showLockFooter(fate?.expireAt);
     }
 
     return {

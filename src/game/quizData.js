@@ -1,6 +1,8 @@
 ﻿export const QUIZ_KINDS = Object.freeze({
   CHOICE: "choice",
   WORD: "word",
+  STROOP: "stroop",
+  REACTION: "reaction",
 });
 
 export const QUIZ_KIND_OPTIONS = [
@@ -13,6 +15,16 @@ export const QUIZ_KIND_OPTIONS = [
     id: QUIZ_KINDS.WORD,
     label: "🔤 Word Puzzle",
     description: "Sắp xếp chữ cái để ra đáp án đúng.",
+  },
+  {
+    id: QUIZ_KINDS.STROOP,
+    label: "🎯 Ai nhanh hơn",
+    description: "Bấm theo MÀU thật, đừng đọc chữ.",
+  },
+  {
+    id: QUIZ_KINDS.REACTION,
+    label: "⚡ Phản xạ nhanh",
+    description: "Bấm đúng lúc, đừng bấm sớm.",
   },
 ];
 
@@ -304,3 +316,44 @@ export const WORD_PUZZLE_SET = [
   },
 
 ];
+
+export const STROOP_DYNAMIC_CONFIG = Object.freeze({
+  answerTimeMsMin: 4400,
+  answerTimeMsMax: 5600,
+  // Chi dung 1 mau XANH (blue), khong tach xanh la/xanh duong.
+  colors: Object.freeze([
+    { token: "red", label: "MÀU ĐỎ" },
+    { token: "blue", label: "MÀU XANH" },
+    { token: "yellow", label: "MÀU VÀNG" },
+    { token: "purple", label: "MÀU TÍM" },
+    { token: "orange", label: "MÀU CAM" },
+    { token: "pink", label: "MÀU HỒNG" },
+    { token: "brown", label: "MÀU NÂU" },
+  ]),
+  mediaPool: Object.freeze([
+    "/assets/images/hoc.jpg",
+    "/assets/images/suynghi.jpg",
+    "/assets/images/daudau.png",
+    "/assets/images/uwu.jpg",
+    "/assets/images/leuleu.jpg",
+    "/assets/images/dautim.jpg",
+  ]),
+});
+
+export const REACTION_DYNAMIC_CONFIG = Object.freeze({
+  waitMinMs: 1000,
+  waitMaxMs: 4000,
+  responseWindowMs: 500,
+  prompts: Object.freeze([
+    "Đợi tín hiệu rồi bấm thật nhanh!",
+    "Bẫy đấy, chưa được bấm đâu nha!",
+    "Giữ tay yên, chờ hiệu lệnh!",
+  ]),
+  buttonLabels: Object.freeze(["🎉 BẤM NGAY!"]),
+  mediaPool: Object.freeze([
+    "/assets/images/uwu.jpg",
+    "/assets/images/daudau.png",
+    "/assets/images/leuleu.jpg",
+    "/assets/images/suynghi.jpg",
+  ]),
+});

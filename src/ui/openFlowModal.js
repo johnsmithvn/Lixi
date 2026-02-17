@@ -8,6 +8,7 @@ const OPEN_FLOW_STEPS = Object.freeze({
 
 const DEFAULT_CONFIRM_FACE = '🤔';
 const DEFAULT_FINAL_FACE = '⚠️';
+const DEFAULT_FINAL_FACE_IMAGE = '/assets/images/yamero.jpg';
 
 function hasImageSrc(value) {
     return typeof value === 'string' && value.trim().length > 0;
@@ -73,7 +74,7 @@ export function createOpenFlowModalController() {
     function renderStepTalk() {
         refs.step.textContent = 'Lời thì thầm của vũ trụ...';
         renderFace({
-            emoji: context?.faceEmoji ?? '🧧',
+            emoji: context?.faceEmoji ?? '(„• ֊ •„)੭',
             imageSrc: context?.faceImage ?? null,
             imageAlt: context?.faceLabel ?? 'Bao lì xì'
         });
@@ -102,7 +103,7 @@ export function createOpenFlowModalController() {
         refs.step.textContent = 'Bước 3: Cảnh báo cấp cao';
         renderFace({
             emoji: DEFAULT_FINAL_FACE,
-            imageSrc: APP_CONFIG.openFlow.finalFaceImage,
+            imageSrc: APP_CONFIG.openFlow.finalFaceImage ?? DEFAULT_FINAL_FACE_IMAGE,
             imageAlt: 'Cảnh báo cấp cao'
         });
         refs.title.textContent = 'Bao này đang rung mạnh...';

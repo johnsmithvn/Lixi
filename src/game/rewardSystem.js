@@ -1,5 +1,5 @@
 ﻿import { APP_CONFIG } from '../core/config.js';
-import { randomItem } from '../utils/random.js';
+import { randomItem, shuffle } from '../utils/random.js';
 
 const ENVELOPE_FACES = [
     { emoji: '😎', label: 'Bao Ngầu', modalEmoji: 'ദ്ദി◝ ⩊ ◜.ᐟ' },
@@ -68,6 +68,15 @@ export function getHoverQuote() {
 
 export function createEnvelopeSet() {
     const selectedFaces = Array.from({ length: APP_CONFIG.totalEnvelopes }, () => randomItem(ENVELOPE_FACES));
+
+    if (APP_CONFIG.rewardDistribution?.mode === 'COUNT') {
+        return createEnvelopeSetByCounts(selectedFaces);
+    }
+
+    return createEnvelopeSetByChance(selectedFaces);
+}
+
+function createEnvelopeSetByChance(selectedFaces) {
     const trollChance = APP_CONFIG.probabilities.trollChance;
     const specialThreshold = trollChance + APP_CONFIG.probabilities.specialChance;
     const moneyThreshold = specialThreshold + APP_CONFIG.probabilities.moneyChance;
@@ -90,6 +99,41 @@ export function createEnvelopeSet() {
             isTroll,
             isSpecial,
             isMoney,
+            opened: false
+        };
+    });
+}
+
+function createEnvelopeSetByCounts(selectedFaces) {
+    const total = selectedFaces.length;
+    const configuredCounts = APP_CONFIG.rewardDistribution?.counts ?? {};
+
+    let slotsLeft = total;
+    const specialCount = Math.min(slotsLeft, Math.max(0, configuredCounts.special ?? 0));
+    slotsLeft -= specialCount;
+
+    const moneyCount = Math.min(slotsLeft, Math.max(0, configuredCounts.money ?? 0));
+    slotsLeft -= moneyCount;
+
+    const trollCount = Math.min(slotsLeft, Math.max(0, configuredCounts.troll ?? 0));
+    slotsLeft -= trollCount;
+
+    const rewardTypes = shuffle([
+        ...Array.from({ length: specialCount }, () => 'special'),
+        ...Array.from({ length: moneyCount }, () => 'money'),
+        ...Array.from({ length: trollCount }, () => 'troll'),
+        ...Array.from({ length: slotsLeft }, () => 'joke')
+    ]);
+
+    return selectedFaces.map((face, index) => {
+        const type = rewardTypes[index] ?? 'joke';
+
+        return {
+            index,
+            face,
+            isTroll: type === 'troll',
+            isSpecial: type === 'special',
+            isMoney: type === 'money',
             opened: false
         };
     });
@@ -122,7 +166,9 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
                 icon: '👑',
                 title: `GIẢI ĐẶC BIỆT: ${SPECIAL_REWARD}`,
                 text: 'Bạn vừa mở trúng giải to nhất mùa Tết này! 🎆',
-                claimNote: '✨ Trúng đậm rồi! Nếu muốn đổi vận, bạn vẫn có thể bốc lại qua quiz nha!',
+                claimNote: APP_CONFIG.quiz.winContinueMode === true
+                    ? '✨ Trúng đậm rồi! Trúng là được bốc tiếp luôn, không cần quiz nha!'
+                    : '✨ Trúng đậm rồi! Nếu muốn đổi vận, bạn vẫn có thể bốc lại qua quiz nha!',
                 streak: nextStreak,
                 blessing: 'Phúc - Lộc - Thọ hội tụ, năm nay chắc chắn khởi sắc! 🏮',
                 blessingList: SPECIAL_BLESSINGS,
@@ -138,7 +184,7 @@ export function resolveEnvelopeResult(envelope, currentStreak) {
             nextStreak,
             result: {
                 type: 'money',
-                icon: '🧧',
+                icon: '(„• ֊ •„)੭',
                 title: `Bạn nhận được: ${randomItem(MONEY_REWARDS)}`,
                 text: 'Đầu năm bốc trúng lộc, quá đã luôn! 💸',
                 claimNote: '📸 Chụp ảnh màn hình gửi chủ thớt để lĩnh xèng nha!',
