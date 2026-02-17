@@ -17,9 +17,17 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.9.0`
+**Current:** `0.9.1`
 
 ## 4. Lich su thay doi
+
+## [0.9.1] - 2026-02-17
+
+### Fixed
+- Sua lock flow trong `winContinueMode`:
+  - Ket qua `troll/joke` khong con duoc mo tiep truc tiep.
+  - Sau khi xit, user phai qua mini-quiz moi mo duoc bao tiep theo.
+  - `money/special` van giu behavior mo tiep ngay (khong can quiz).
 
 ## [0.9.0] - 2026-02-17
 

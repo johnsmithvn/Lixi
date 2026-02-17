@@ -68,6 +68,7 @@ window.APP_CONFIG = {
     enabledInLockedMode: true,
 
     // true: trung money/special thi duoc mo tiep ngay, bo qua quiz
+    // neu xit (troll/joke) van phai qua quiz moi mo tiep
     // maxAttempts luc nay duoc tinh la so luot xit toi da truoc khi khoa
     winContinueMode: false,
 
@@ -111,6 +112,8 @@ Luu y quan trong:
 - `GAME.rewardMode = 'COUNT'`: neu tong count vuot `totalEnvelopes`, he thong uu tien `special -> money -> troll`.
 - `QUIZ.winContinueMode = false`: `maxAttempts` la quota quiz.
 - `QUIZ.winContinueMode = true`: `maxAttempts` la so luot xit toi da truoc khi khoa.
+  - Trung `money/special`: duoc mo tiep ngay, khong can quiz.
+  - Xit `troll/joke`: van phai qua quiz moi mo tiep.
 - Khi `winContinueMode = true`, ket qua trung dau tien duoc giu (khong bi doi bang ket qua mo sau).
 
 ## 5. Quiz data

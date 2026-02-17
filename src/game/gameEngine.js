@@ -52,10 +52,6 @@ export function createGameEngine(eventBus = defaultEventBus) {
     }
 
     function isExtraQuizEnabled() {
-        if (isWinContinueModeEnabled()) {
-            return false;
-        }
-
         return APP_CONFIG.quiz.enabledInLockedMode === true;
     }
 
@@ -229,8 +225,13 @@ export function createGameEngine(eventBus = defaultEventBus) {
                         // If no winning fate yet, lock with current miss result.
                         shouldLock = !activeFate;
                     } else {
-                        state.extraChanceUnlocked = true;
-                        state.extraChanceAvailable = false;
+                        // Miss in win-continue still needs quiz to unlock next envelope.
+                        state.extraChanceUnlocked = false;
+                        state.extraChanceAvailable = true;
+                        eventBus.emit('session:extra-chance-offered', {
+                            mode: gameMode.mode,
+                            result: state.currentResult
+                        });
                         shouldLock = false;
                     }
                 }

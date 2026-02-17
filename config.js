@@ -26,7 +26,8 @@
         enabledInLockedMode: true,
         // true: Trung money/special se duoc mo tiep ngay, khong can quiz.
         // Ket qua trung truoc do duoc giu, khong bi doi thanh ket qua truot sau.
-        winContinueMode: false,
+        // Neu xit (troll/joke) thi van phai qua quiz moi duoc mo tiep.
+        winContinueMode: true,
         // true: moi cau hoi chi hien 1 lan tren 1 thiet bi (luu localStorage).
         // false: co the lap lai cau hoi.
         uniquePerDevice: true,
@@ -40,9 +41,9 @@
             '/assets/images/suynghi.jpg',
             // '/assets/images/daudau.png',
             // '/assets/images/uwu.jpg',
-            // '/assets/images/leuleu.jpg',
+            '/assets/images/leuleu.jpg',
             // '/assets/images/dautim.jpg'
-                        '/assets/images/tenor.gif'
+            '/assets/images/tenor.gif'
 
         ]
     },
@@ -69,7 +70,7 @@
     TIMINGS: {
         // Delay hien "reveal troll" trong modal ket qua (don vi: ms).
         // Vi du: 1200 = 1.2s.
-        trollRevealDelayMs: 1111
+        trollRevealDelayMs: 900
     },
 
     // ===== LOCK DURATION =====
