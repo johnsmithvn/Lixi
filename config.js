@@ -26,7 +26,7 @@
         enabledInLockedMode: true,
         // true: Trung money/special se duoc mo tiep ngay, khong can quiz.
         // Ket qua trung truoc do duoc giu, khong bi doi thanh ket qua truot sau.
-        winContinueMode: true,
+        winContinueMode: false,
         // true: moi cau hoi chi hien 1 lan tren 1 thiet bi (luu localStorage).
         // false: co the lap lai cau hoi.
         uniquePerDevice: true,
