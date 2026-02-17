@@ -86,6 +86,16 @@ function asOptionalString(value) {
     return trimmed.length > 0 ? trimmed : null;
 }
 
+function asStringList(value) {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+
+    return value
+        .map((item) => String(item ?? '').trim())
+        .filter(Boolean);
+}
+
 function asTimestampMs(value) {
     if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
         return value;
@@ -349,7 +359,14 @@ export const APP_CONFIG = {
             globalConfig,
             ['QUIZ', 'uniquePerDevice'],
             ['QUIZ_UNIQUE_PER_DEVICE']
-        ) !== false
+        ) !== false,
+        mediaPool: asStringList(
+            pickConfigValue(
+                globalConfig,
+                ['QUIZ', 'mediaPool'],
+                ['QUIZ_MEDIA_POOL']
+            )
+        )
     },
     openFlow: {
         mode: openFlowMode,

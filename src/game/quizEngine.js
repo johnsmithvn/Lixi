@@ -226,10 +226,28 @@ const DYNAMIC_STROOP_MEDIA_POOL = Object.freeze(
         .filter(Boolean)
 );
 
+const CONFIG_SHARED_MEDIA_POOL = Object.freeze(
+    (Array.isArray(APP_CONFIG.quiz?.mediaPool) ? APP_CONFIG.quiz.mediaPool : [])
+        .map((item) => String(item ?? '').trim())
+        .filter(Boolean)
+);
+
+const ACTIVE_STROOP_MEDIA_POOL = Object.freeze(
+    CONFIG_SHARED_MEDIA_POOL.length > 0
+        ? CONFIG_SHARED_MEDIA_POOL
+        : DYNAMIC_STROOP_MEDIA_POOL
+);
+
 const DYNAMIC_REACTION_MEDIA_POOL = Object.freeze(
     (Array.isArray(REACTION_DYNAMIC_CONFIG?.mediaPool) ? REACTION_DYNAMIC_CONFIG.mediaPool : [])
         .map((item) => String(item ?? '').trim())
         .filter(Boolean)
+);
+
+const ACTIVE_REACTION_MEDIA_POOL = Object.freeze(
+    CONFIG_SHARED_MEDIA_POOL.length > 0
+        ? CONFIG_SHARED_MEDIA_POOL
+        : DYNAMIC_REACTION_MEDIA_POOL
 );
 
 const DYNAMIC_REACTION_PROMPTS = Object.freeze(
@@ -283,7 +301,7 @@ function buildDynamicStroopQuestion() {
     const answerTimeMin = asPositiveInt(STROOP_DYNAMIC_CONFIG?.answerTimeMsMin, 4400);
     const answerTimeMax = asPositiveInt(STROOP_DYNAMIC_CONFIG?.answerTimeMsMax, 5600);
     const answerTimeMs = randomInt(Math.min(answerTimeMin, answerTimeMax), Math.max(answerTimeMin, answerTimeMax));
-    const media = DYNAMIC_STROOP_MEDIA_POOL.length > 0 ? randomItem(DYNAMIC_STROOP_MEDIA_POOL) : null;
+    const media = ACTIVE_STROOP_MEDIA_POOL.length > 0 ? randomItem(ACTIVE_STROOP_MEDIA_POOL) : null;
 
     return {
         id: createDynamicId('stroop'),
@@ -305,7 +323,7 @@ function buildDynamicReactionQuestion() {
     const waitMinMs = asPositiveInt(REACTION_DYNAMIC_CONFIG?.waitMinMs, 1000);
     const waitMaxMs = asPositiveInt(REACTION_DYNAMIC_CONFIG?.waitMaxMs, 4000);
     const responseWindowMs = asPositiveInt(REACTION_DYNAMIC_CONFIG?.responseWindowMs, 500);
-    const media = DYNAMIC_REACTION_MEDIA_POOL.length > 0 ? randomItem(DYNAMIC_REACTION_MEDIA_POOL) : null;
+    const media = ACTIVE_REACTION_MEDIA_POOL.length > 0 ? randomItem(ACTIVE_REACTION_MEDIA_POOL) : null;
     const question = DYNAMIC_REACTION_PROMPTS.length > 0
         ? randomItem(DYNAMIC_REACTION_PROMPTS)
         : 'Đợi tín hiệu rồi bấm thật nhanh!';

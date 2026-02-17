@@ -12,7 +12,7 @@
     OPEN_GATE: {
         enabled: true,
         // Vi du: '2026-02-20T20:00:00+07:00'
-        at: '2026-02-17T17:00:00+07:00',
+        at: '2026-02-17T14:00:00+07:00',
         // Cho phep choi quiz trong luc cho mo cua
         allowQuiz: true
     },
@@ -29,7 +29,22 @@
         winContinueMode: true,
         // true: moi cau hoi chi hien 1 lan tren 1 thiet bi (luu localStorage).
         // false: co the lap lai cau hoi.
-        uniquePerDevice: true
+        uniquePerDevice: true,
+
+        // Danh sach anh random dung chung cho 2 mini game:
+        // - "Ai nhanh hon" (stroop)
+        // - "Phan xa nhanh" (reaction)
+        // De [] hoac bo qua de dung list mac dinh trong code.
+        mediaPool: [
+            '/assets/images/hoc.jpg',
+            '/assets/images/suynghi.jpg',
+            // '/assets/images/daudau.png',
+            // '/assets/images/uwu.jpg',
+            // '/assets/images/leuleu.jpg',
+            // '/assets/images/dautim.jpg'
+                        '/assets/images/tenor.gif'
+
+        ]
     },
 
     // ===== GAME BALANCE =====
