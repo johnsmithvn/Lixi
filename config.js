@@ -21,7 +21,7 @@
     QUIZ: {
         // So lan tra loi mini-quiz toi da trong 1 session lock.
         // Dat = 0 de khoa mini-quiz.
-        maxAttempts: 1,
+        maxAttempts: 30,
         // LOCKED mode co cho mini-quiz de mo them co hoi hay khong.
         enabledInLockedMode: true,
         // true: Trung money/special se duoc mo tiep ngay, khong can quiz.
