@@ -17,9 +17,27 @@ Tai lieu theo doi version va lich su thay doi.
 
 ## 3. Current Version
 
-**Current:** `0.9.1`
+**Current:** `0.10.0`
 
 ## 4. Lich su thay doi
+
+## [0.10.0] - 2026-02-18
+
+### Added
+- Them `Settings` UI tren web:
+  - Icon `⚙` o goc phai man hinh.
+  - Modal cau hinh co cac nhom `GAME`, `TIMINGS`, `QUIZ`.
+  - Nut `Luu` de ap dung cau hinh.
+  - Nut `Reset mac dinh` de quay ve config ban dau.
+- Them module moi: `src/ui/settingsPanel.js`.
+
+### Changed
+- `config.js` chuyen sang co che:
+  - giu `BASE_APP_CONFIG` lam mac dinh.
+  - merge override tu `localStorage` vao runtime config.
+  - expose `window.APP_DEFAULT_CONFIG` va `window.APP_CONFIG_STORAGE_KEY` de Settings UI su dung.
+- Them key luu override config: `lixi_app_config_overrides_v1`.
+- Cap nhat `main.js`, `index.html`, `style.css` de tich hop flow Settings va UI responsive.
 
 ## [0.9.1] - 2026-02-17
 

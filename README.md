@@ -11,6 +11,10 @@ Web mini-game li xi theo huong mobile-first, khong can backend, chay duoc tren s
 ## 2. Tinh nang hien tai
 
 - Mo bao li xi voi reveal animation + confetti + vibration + sound.
+- Co `Settings` UI tren web (icon `⚙` goc phai):
+  - sua nhanh config `GAME`, `TIMINGS`, `QUIZ`
+  - `Luu` -> localStorage + reload
+  - `Reset mac dinh` -> xoa override + reload
 - Reward type:
   - `money`
   - `special`
@@ -49,7 +53,7 @@ Thu tu resolve mode:
 ## 4. Config nhanh (config.js)
 
 ```js
-window.APP_CONFIG = {
+const BASE_APP_CONFIG = {
   MODE: 'LOCKED',
   MODE_OPTIONS: {
     allowQueryOverride: true
@@ -115,6 +119,9 @@ Luu y quan trong:
   - Trung `money/special`: duoc mo tiep ngay, khong can quiz.
   - Xit `troll/joke`: van phai qua quiz moi mo tiep.
 - Khi `winContinueMode = true`, ket qua trung dau tien duoc giu (khong bi doi bang ket qua mo sau).
+- Runtime config duoc expose qua `window.APP_CONFIG`.
+- Default config duoc expose qua `window.APP_DEFAULT_CONFIG`.
+- Override tu Settings UI duoc luu trong localStorage key: `lixi_app_config_overrides_v1`.
 
 ## 5. Quiz data
 

@@ -7,6 +7,7 @@ import { playRevealAnimation } from './src/ui/envelope.js';
 import { createModalController } from './src/ui/modal.js';
 import { createOpenFlowModalController } from './src/ui/openFlowModal.js';
 import { createQuizModalController } from './src/ui/quizModal.js';
+import { createSettingsPanelController } from './src/ui/settingsPanel.js';
 import { createConfettiController } from './src/effects/confetti.js';
 import { createSoundController } from './src/effects/sound.js';
 import { vibrate } from './src/effects/vibration.js';
@@ -15,6 +16,7 @@ const renderer = createRenderer();
 const modal = createModalController();
 const openFlow = createOpenFlowModalController();
 const quizModal = createQuizModalController();
+const settingsPanel = createSettingsPanelController();
 const confetti = createConfettiController();
 const sounds = createSoundController();
 const game = createGameEngine(eventBus);
@@ -613,6 +615,7 @@ function handleEnterFromOpenGate() {
 function bootstrap() {
     sounds.init();
     cacheGateRefs();
+    settingsPanel.init();
 
     renderer.init(
         {

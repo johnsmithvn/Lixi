@@ -84,6 +84,33 @@
 
     </div>
 
+    <button
+        id="settings-toggle-btn"
+        class="settings-toggle-btn"
+        type="button"
+        aria-label="Mo settings"
+        aria-controls="settings-modal"
+        aria-expanded="false"
+    >
+        ⚙
+    </button>
+
+    <div id="settings-modal" class="settings-modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="settings-backdrop" data-close-settings="true"></div>
+        <section class="settings-sheet">
+            <p class="settings-badge">Settings</p>
+            <h3 id="settings-title" class="settings-title">Cau hinh game</h3>
+            <p class="settings-note">Thay doi luu tren localStorage cua thiet bi nay.</p>
+            <form id="settings-form" class="settings-form"></form>
+            <p id="settings-status" class="settings-status hidden"></p>
+            <div class="settings-actions">
+                <button id="settings-reset-btn" class="settings-btn settings-btn--ghost" type="button">Reset mac dinh</button>
+                <button id="settings-close-btn" class="settings-btn settings-btn--light" type="button">Dong</button>
+                <button id="settings-save-btn" class="settings-btn settings-btn--primary" type="button">Luu</button>
+            </div>
+        </section>
+    </div>
+
     <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="result-main">
         <div class="modal-backdrop" data-close-modal="true"></div>
         <div class="modal-content">
