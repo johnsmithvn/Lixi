@@ -24,7 +24,7 @@
         QUIZ: {
             // Neu winContinueMode = false: so lan tra loi mini-quiz toi da.
             // Neu winContinueMode = true: so luot xit toi da truoc khi bi khoa.
-            maxAttempts: 20,
+            maxAttempts: 3,
             // LOCKED mode co cho mini-quiz de mo them co hoi hay khong.
             enabledInLockedMode: true,
             // true: Trung money/special se duoc mo tiep ngay, khong can quiz.
