@@ -64,7 +64,7 @@
             // COUNT mode (chi dung khi rewardMode = 'COUNT')
             // Neu tong vuot totalEnvelopes, uu tien giu: special -> money -> troll.
             trollCount: 3,
-            specialCount: 4,
+            specialCount: 1,
             moneyCount: 3
         },
 
