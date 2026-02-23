@@ -52,7 +52,7 @@
 
         // ===== GAME BALANCE =====
         GAME: {
-            totalEnvelopes: 10,
+            totalEnvelopes: 16,
             // 'CHANCE' = theo ti le % ; 'COUNT' = theo so luong
             rewardMode: 'COUNT',
 
@@ -63,7 +63,7 @@
 
             // COUNT mode (chi dung khi rewardMode = 'COUNT')
             // Neu tong vuot totalEnvelopes, uu tien giu: special -> money -> troll.
-            trollCount: 3,
+            trollCount: 2,
             specialCount: 1,
             moneyCount: 3
         },
