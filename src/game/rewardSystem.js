@@ -29,8 +29,8 @@ const HOVER_QUOTES = [
     'Bốc tui xong nhớ giữ phong độ may mắn nha ✨'
 ];
 
-const MONEY_REWARDS = ['99.999đ'];
-const SPECIAL_REWARD = '200.000đ';
+const MONEY_REWARDS = ['20.000đ,30.000đ,40.000đ'];
+const SPECIAL_REWARD = '50000đ';
 const SPECIAL_BLESSINGS = [
     'Chúc cho 1 năm mới vạn sự như ý  🌟',
     'Triệu sự như mơ  🤝',
